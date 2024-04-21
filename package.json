@@ -1,0 +1,22 @@
+{
+  "name": "index.js",
+  "version": "1.0.0",
+  "description": "Backend for Open Intelligent Journal System",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fitrahrn/BackEnd-Open-Intelligent-Journal-System.git"
+  },
+  "author": "Fitrah Ramadhani Nugroho",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fitrahrn/BackEnd-Open-Intelligent-Journal-System/issues"
+  },
+  "homepage": "https://github.com/fitrahrn/BackEnd-Open-Intelligent-Journal-System#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
