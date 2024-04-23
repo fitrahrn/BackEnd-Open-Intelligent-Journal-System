@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
-    const { name,public_name, username, email, password, confPassword,phone, orcid_id, affliation, mailing_address,signature } = req.body;
+    const { name,public_name, username, email, password, confPassword,phone, orcid_id, affiliation, mailing_address,signature,country } = req.body;
     if (!(name && username && email && password && confPassword)) return res.status(400).json({msg: "All input is required"});
     if (password !== confPassword) return res.status(400).json({msg: "Password and Confirm Password don't match"});
 
@@ -25,9 +25,10 @@ export const register = async (req, res) => {
             password: hashPassword,
             phone: phone,
             orcid_id: orcid_id,
-            affliation: affliation,
+            affiliation: affiliation,
             mailing_address: mailing_address,
             signature:signature,
+            country:country,
         });
         res.status(200).json({msg: "Registration Successful"});
     } catch (error) {

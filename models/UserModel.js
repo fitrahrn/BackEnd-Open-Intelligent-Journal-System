@@ -22,6 +22,7 @@ const User = db.define('user', {
     affliation: DataTypes.STRING,
     mailing_address: DataTypes.STRING,
     signature: DataTypes.STRING,
+    country:DataTypes.STRING,
 }, {
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
