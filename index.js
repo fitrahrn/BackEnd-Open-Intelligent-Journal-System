@@ -4,7 +4,7 @@ import cors from "cors";
 import FileUpload from "express-fileupload";
 import cookieParser from "cookie-parser";
 import AuthRoute from "./routes/AuthRoute.js";
-
+import JournalRoute from "./routes/JournalRoute.js";
   
 const app = express(); 
 const PORT = 3001; 
@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(FileUpload());
 app.use(express.static("public"));
 app.use(AuthRoute);
+app.use(JournalRoute);
 
 
 app.listen(PORT, (error) =>{ 
