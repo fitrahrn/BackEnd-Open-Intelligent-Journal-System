@@ -3,7 +3,6 @@ import fs from "fs"
 import Journal from "../models/JournalModel.js"
 import User from "../models/UserModel.js"
 import querystring from "querystring"
-import axios from "axios"
 
 export const getJournals = async(req, res) => {
     try {

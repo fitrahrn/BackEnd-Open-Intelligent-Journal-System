@@ -23,3 +23,4 @@ const Journal = db.define('journal',{
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
+export default Journal;

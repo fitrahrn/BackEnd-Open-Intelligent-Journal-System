@@ -8,9 +8,9 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/allJournals", verifyToken, getJournals);
+router.get("/allJournals", getJournals);
 router.get("/journal/:id",verifyToken,getJournalsById);
-router.get("journal/:path",verifyToken,getJournalsByPath);
+router.get("journal/:path",getJournalsByPath);
 
 
 export default router;
