@@ -11,6 +11,7 @@ const Journal = db.define('journal',{
     title : DataTypes.STRING,
     initials: DataTypes.STRING,
     abbreviation : DataTypes.STRING,
+    description: DataTypes.TEXT,
     path: DataTypes.STRING,
     image_path: DataTypes.STRING,
     languages: DataTypes.STRING,

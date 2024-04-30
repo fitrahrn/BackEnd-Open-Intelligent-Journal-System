@@ -5,7 +5,8 @@ import FileUpload from "express-fileupload";
 import cookieParser from "cookie-parser";
 import AuthRoute from "./routes/AuthRoute.js";
 import JournalRoute from "./routes/JournalRoute.js";
-  
+import IssueRoute from "./routes/IssueRoute.js"
+
 const app = express(); 
 const PORT = 3001; 
   
@@ -16,6 +17,8 @@ app.use(FileUpload());
 app.use(express.static("public"));
 app.use(AuthRoute);
 app.use(JournalRoute);
+app.use(IssueRoute);
+
 
 
 app.listen(PORT, (error) =>{ 
