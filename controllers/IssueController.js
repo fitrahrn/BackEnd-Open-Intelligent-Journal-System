@@ -25,7 +25,6 @@ export const getIssueByJournal = async(req, res) => {
                 path : req.params.journal
             }
         });
-        console.log(journalResponse)
         const response = await Issue.findAll({
             where : {
                 journal_id : journalResponse.dataValues.journal_id

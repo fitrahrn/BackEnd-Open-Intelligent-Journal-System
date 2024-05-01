@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import AuthRoute from "./routes/AuthRoute.js";
 import JournalRoute from "./routes/JournalRoute.js";
 import IssueRoute from "./routes/IssueRoute.js"
+import ArticleRoute from "./routes/ArticleRoute.js"
 
 const app = express(); 
 const PORT = 3001; 
@@ -18,6 +19,7 @@ app.use(express.static("public"));
 app.use(AuthRoute);
 app.use(JournalRoute);
 app.use(IssueRoute);
+app.use(ArticleRoute);
 
 
 

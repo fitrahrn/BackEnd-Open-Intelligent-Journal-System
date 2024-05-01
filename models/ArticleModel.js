@@ -2,7 +2,7 @@ import { BOOLEAN, Sequelize } from "sequelize";
 import db from "../config/database.js";
 import Journal from "./JournalModel.js";
 import Issue from "./IssueModel.js";
-
+import User from "./UserModel.js";
 const {DataTypes} = Sequelize;
 
 const Article = db.define('article',{
@@ -38,4 +38,6 @@ const Article = db.define('article',{
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
+
+
 export default Article;
