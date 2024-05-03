@@ -87,9 +87,18 @@ export const getArticlesByJournal = async(req, res) => {
             });
             //response.author = {}
             for(let j=0;j<authorResponse.length;j++){
-                articles.push(authorResponse[j].dataValues.user.dataValues.name)
+                articles.push(authorResponse[j].dataValues.user.dataValues.name + ', ')
             }
             response[i].dataValues.authors = articles
+            const issueResponse = await Issue.findOne({
+                where : {
+                    issue_id : response[i].dataValues.issue_id
+                }
+    
+            });
+            response[i].dataValues.year = issueResponse.dataValues.year
+            response[i].dataValues.volume = issueResponse.dataValues.volume
+            response[i].dataValues.issue = issueResponse.dataValues.number
         }
         res.status(200).json(response);
     } catch (error) {
