@@ -28,6 +28,14 @@ const Contributors = db.define('contributors',{
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
-Article.belongsToMany(User, {through:Contributors});
-User.belongsToMany(Article,{through:Contributors});
+// Article.belongsToMany(User, {through:Contributors});
+// User.belongsToMany(Article,{through:Contributors});
+User.hasMany(Contributors,{foreignKey:'user_id'});
+Contributors.belongsTo(User,{
+    foreignKey:'user_id'
+});
+Article.hasMany(Contributors,{foreignKey:'article_id'});
+Contributors.belongsTo(Article,{
+    foreignKey:'article_id'
+})
 export default Contributors;

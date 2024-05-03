@@ -71,15 +71,25 @@ export const getArticlesByJournal = async(req, res) => {
 
         });
         let articles = [];
+        console.log(response.length)
         for(let i=0;i<response.length;i++){
+            console.log(response[i].dataValues.article_id)
             const authorResponse = await Contributors.findAll({
-                include:User,
                 where : {
                     article_id : response[i].dataValues.article_id
-                }
+                },
+                include:[{
+                    model:User,
+                    required: true,
+                    attributes:['name'],
+                }],
+
             });
-            console.log(authorResponse)
-            //response[i].dataValues.authors = {}
+            //response.author = {}
+            for(let j=0;j<authorResponse.length;j++){
+                articles.push(authorResponse[j].dataValues.user.dataValues.name)
+            }
+            response[i].dataValues.authors = articles
         }
         res.status(200).json(response);
     } catch (error) {
