@@ -106,3 +106,37 @@ export const getArticlesByJournal = async(req, res) => {
     }
 }
 
+export const createArticle = async (req, res) => {
+    const { journalPath,prefix,title,subtitle,abstract,keywords} = req.body;
+    if (!(name && username && email && password && confPassword)) return res.status(400).json({msg: "All input is required"});
+    if (password !== confPassword) return res.status(400).json({msg: "Password and Confirm Password don't match"});
+
+    const findJournal = await Journal.findOne({
+        where: {
+            email: email
+        }
+    });
+    if (oldUser) return res.status(409).json({msg: "User already exists"});
+
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(password, salt);
+    try {
+        await User.create({
+            name: name,
+            public_name: public_name,
+            username: username,
+            email: email,
+            password: hashPassword,
+            phone: phone,
+            orcid_id: orcid_id,
+            affiliation: affiliation,
+            mailing_address: mailing_address,
+            signature:signature,
+            country:country,
+        });
+        res.status(200).json({msg: "Registration Successful"});
+    } catch (error) {
+        res.status(500).json({msg: "Registration failed"});
+    }
+}
+
