@@ -107,36 +107,99 @@ export const getArticlesByJournal = async(req, res) => {
 }
 
 export const createArticle = async (req, res) => {
-    const { journalPath,prefix,title,subtitle,abstract,keywords} = req.body;
-    if (!(name && username && email && password && confPassword)) return res.status(400).json({msg: "All input is required"});
-    if (password !== confPassword) return res.status(400).json({msg: "Password and Confirm Password don't match"});
+    const { prefix,title,subtitle,abstract,keywords,article_path} = req.body;
+    if (!(title && abstract && article_path)) return res.status(400).json({msg: "All input is required"});
+
+    const checkTitle = await Article.findOne({
+        where: {
+            title: title
+        }
+    });
+    if (checkTitle) return res.status(409).json({msg: "Article already exist"});
 
     const findJournal = await Journal.findOne({
         where: {
-            email: email
+            path: req.params.journal
         }
     });
-    if (oldUser) return res.status(409).json({msg: "User already exists"});
-
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(password, salt);
+    if (!findJournal) return res.status(409).json({msg: "Journal not found"});
+    const findIssue = await Issue.findOne({
+        where: {
+            [Op.and]:{
+                journal_id: findJournal.dataValues.journal_id,
+                date_published : {
+                    [Op.lt]:'2000-%'
+                },
+                appear: false
+            }
+        }
+    });
+    if (!findIssue) return res.status(409).json({msg: "No unpublished issue found"});
+    
     try {
-        await User.create({
-            name: name,
-            public_name: public_name,
-            username: username,
-            email: email,
-            password: hashPassword,
-            phone: phone,
-            orcid_id: orcid_id,
-            affiliation: affiliation,
-            mailing_address: mailing_address,
-            signature:signature,
-            country:country,
+        await Article.create({
+            journal_id : findJournal.dataValues.journal_id,
+            issue_id : findIssue.dataValues.issue_id,
+            prefix: prefix,
+            title: title,
+            subtitle : subtitle,
+            abstract : abstract,
+            article_path : article_path,
+            comment : "",
+            keywords : keywords,
+            workflow_phase: "submitted",
+            status: "not reviewed"
         });
-        res.status(200).json({msg: "Registration Successful"});
+        res.status(200).json({msg: "Article created successfully",
+            data: {
+                journal_id : findJournal.dataValues.journal_id,
+                issue_id : findIssue.dataValues.issue_id,
+                prefix: prefix,
+                title: title,
+                subtitle : subtitle,
+                abstract : abstract,
+                article_path : article_path,
+                comment : "",
+                keywords : keywords,
+                workflow_phase: "submitted",
+                status: "not reviewed"
+            }
+        });
     } catch (error) {
-        res.status(500).json({msg: "Registration failed"});
+        res.status(500).json({msg: "Article failed to create"});
+    }
+}
+export const updateArticle = async (req, res) => {
+
+    try {
+        await Article.update(req.body, {
+            where : {
+                article_id: req.params.id
+            }
+        });
+        res.status(200).json({msg: "Article updated",
+            data: req.body
+        });
+    } catch (error) {
+        res.status(500).json({msg: "Article failed to update"});
     }
 }
 
+export const deleteArticle = async(req, res) => {
+    const article = await Article.findOne({
+        where : {
+            article_id : req.params.id
+        }
+    });
+    if(!article) return res.status(404).json({msg : "No Article Found"});
+    try {
+        await Article.destroy({
+            where : {
+                article_id : req.params.id
+            }
+        });
+        res.status(200).json({msg : "Article Deleted Successfully"});
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}

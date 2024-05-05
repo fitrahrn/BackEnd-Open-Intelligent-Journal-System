@@ -36,7 +36,7 @@ export const getJournalsByPath = async(req, res) => {
 
 export const createJournal = async (req, res) => {
     const { title,initials, abbreviation, description,path, image_path, languages,appear, publisher,issn,e_issn,reg_number} = req.body;
-    if (!(title && description && path && languages&& appear)) return res.status(400).json({msg: "All input is required"});
+    if (!(title && description && path && languages&& (appear !=null))) return res.status(400).json({msg: "All input is required"});
 
     const checkTitle = await Journal.findOne({
         where: {
