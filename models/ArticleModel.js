@@ -2,7 +2,6 @@ import { BOOLEAN, Sequelize } from "sequelize";
 import db from "../config/database.js";
 import Journal from "./JournalModel.js";
 import Issue from "./IssueModel.js";
-import User from "./UserModel.js";
 const {DataTypes} = Sequelize;
 
 const Article = db.define('article',{
@@ -27,7 +26,7 @@ const Article = db.define('article',{
     prefix: DataTypes.STRING,
     title : DataTypes.STRING,
     subtitle: DataTypes.STRING,
-    abstract: DataTypes.STRING,
+    abstract: DataTypes.TEXT,
     article_path: DataTypes.STRING,
     comment: DataTypes.STRING,
     keywords: DataTypes.STRING,

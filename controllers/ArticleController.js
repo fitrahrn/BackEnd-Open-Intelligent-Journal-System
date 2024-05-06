@@ -27,6 +27,21 @@ export const getArticleById = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
+export const getArticlesByTitle = async(req, res) => {
+    const { title} = req.body;
+    try {
+        const response = await Article.findAll({
+            where : {
+                title : {
+                    [Op.like] : `%${title}%`
+                }
+            }
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
 export const getArticlesByIssue = async(req, res) => {
     try {
         const journalResponse = await Journal.findOne({
@@ -48,8 +63,6 @@ export const getArticlesByIssue = async(req, res) => {
                     issue_id : issueResponse.dataValues.issue_id,
                     journal_id : journalResponse.dataValues.journal_id
                 }
-                
-
             }
         });
         res.status(200).json(response);
@@ -107,7 +120,7 @@ export const getArticlesByJournal = async(req, res) => {
 }
 
 export const createArticle = async (req, res) => {
-    const { prefix,title,subtitle,abstract,keywords,article_path} = req.body;
+    const { username,prefix,title,subtitle,abstract,keywords,article_path} = req.body;
     if (!(title && abstract && article_path)) return res.status(400).json({msg: "All input is required"});
 
     const checkTitle = await Article.findOne({
@@ -123,6 +136,12 @@ export const createArticle = async (req, res) => {
         }
     });
     if (!findJournal) return res.status(409).json({msg: "Journal not found"});
+    const findUser = await User.findOne({
+        where: {
+            username: username
+        }
+    });
+    if (!findUser) return res.status(409).json({msg: "User not found"});
     const findIssue = await Issue.findOne({
         where: {
             [Op.and]:{
@@ -137,7 +156,7 @@ export const createArticle = async (req, res) => {
     if (!findIssue) return res.status(409).json({msg: "No unpublished issue found"});
     
     try {
-        await Article.create({
+        const article = await Article.create({
             journal_id : findJournal.dataValues.journal_id,
             issue_id : findIssue.dataValues.issue_id,
             prefix: prefix,
@@ -150,6 +169,10 @@ export const createArticle = async (req, res) => {
             workflow_phase: "submitted",
             status: "not reviewed"
         });
+        await Contributors.create({
+            article_id: article.article_id,
+            user_id: findUser.dataValues.user_id,
+        })
         res.status(200).json({msg: "Article created successfully",
             data: {
                 journal_id : findJournal.dataValues.journal_id,

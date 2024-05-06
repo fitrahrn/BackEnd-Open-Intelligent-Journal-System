@@ -14,3 +14,43 @@ export const getUserId = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
+export const getUserByUsername = async(req, res) => {
+    try {
+        const response = await User.findOne({
+            where : {
+                username: req.params.username
+            }
+        });
+        res.status(200).json(response); 
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
+export const getUserByEmail = async(req, res) => {
+    try {
+        const response = await User.findOne({
+            where : {
+                email: req.params.email
+            }
+        });
+        res.status(200).json(response); 
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
+export const findUserByName = async(req, res) => {
+    const { title} = req.body;
+    try {
+        const response = await User.findAll({
+            where : {
+                name : {
+                    [Op.like] : `%${title}%`
+                }
+            }
+        });
+        res.status(200).json(response["user_id"]); 
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
+
