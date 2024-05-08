@@ -1,11 +1,5 @@
-import path from "path"
-import { Op } from "sequelize";
-import Article from "../models/ArticleModel.js"
-import Journal from "../models/JournalModel.js"
-import Issue from "../models/IssueModel.js"
-import querystring from "querystring"
 import Contributors from "../models/ContributorsModel.js";
-import User from "../models/UserModel.js";
+
 
 export const getContributorsFromArticle = async(req, res) => {
     try {
