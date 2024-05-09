@@ -41,6 +41,7 @@ export const getReviewersFromUserReviewers = async(req, res) => {
 
 export const addReviewers = async (req,res)=>{
     const { reviews_id,username,date_assigned,date_due} = req.body;
+    if (!(reviews_id&&username&&date_assigned&&date_due)) return res.status(400).json({msg: "All input is required"});
     try{
         const findUser = await User.findOne({
             where: {
@@ -79,6 +80,7 @@ export const addReviewers = async (req,res)=>{
 }
 export const writeReviews = async (req,res)=>{
     const { reviewers_id, editor_review,author_review,recommendation} = req.body;
+    
     const currentDate = new Date().toLocaleString('lt-LT').substring(0,10);
     try {
         await Reviewers.update({

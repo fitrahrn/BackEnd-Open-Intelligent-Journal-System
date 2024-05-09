@@ -26,6 +26,7 @@ export const getReviewersFileFromReviewersId = async(req, res) => {
 
 export const createReviewersFile = async (req,res)=>{
     const { reviewers_id,reviewers_file} = req.body;
+    if (!(reviewers_id)) return res.status(400).json({msg: "All input is required"});
     try{
 
         await ReviewersFile.create({

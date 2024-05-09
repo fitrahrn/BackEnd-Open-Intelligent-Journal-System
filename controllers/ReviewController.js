@@ -40,6 +40,7 @@ export const getReviewFromReviewRounds = async(req, res) => {
 
 export const createReviews = async (req,res)=>{
     const { article_id,article_file_path} = req.body;
+    if (!(article_id)) return res.status(400).json({msg: "All input is required"});
     try{
         const findPrevReviews = await Reviews.findAll({
             where : {
