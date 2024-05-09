@@ -59,7 +59,7 @@ export const login = async (req, res) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.cookie('email', email,{
+        res.cookie('username', username,{
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000
         });
@@ -71,11 +71,11 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
-    const email = req.cookies.email;
+    const username = req.cookies.username;
     if(!refreshToken) return res.sendStatus(204);
     const user = await User.findOne({
         where:{
-            email: email
+            username: username
         }
     });
     if(!user) return res.sendStatus(204);

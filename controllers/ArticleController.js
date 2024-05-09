@@ -120,9 +120,9 @@ export const getArticlesByJournal = async(req, res) => {
 }
 
 export const createArticle = async (req, res) => {
-    const { username,prefix,title,subtitle,abstract,keywords,article_path} = req.body;
+    const {prefix,title,subtitle,abstract,keywords,article_path} = req.body;
     if (!(title && abstract && article_path)) return res.status(400).json({msg: "All input is required"});
-
+    const username = req.cookies.username;
     const checkTitle = await Article.findOne({
         where: {
             title: title
