@@ -1,5 +1,5 @@
 import { DATE } from "sequelize";
-import Reviewers from "../models/ReviewersModel";
+import Reviewers from "../models/ReviewersModel.js";
 import User from "../models/UserModel.js";
 export const getReviewers = async(req, res) => {
     try {

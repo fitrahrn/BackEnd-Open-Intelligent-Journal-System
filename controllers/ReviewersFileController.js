@@ -1,4 +1,4 @@
-import ReviewersFile from "../models/ReviewersFileModel";
+import ReviewersFile from "../models/ReviewersFileModel.js";
 
 export const getReviewersFile = async(req, res) => {
     try {
