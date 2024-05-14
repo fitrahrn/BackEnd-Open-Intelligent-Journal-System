@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get("/reviewers", getReviewers);
 router.get("/reviewers/:id",getReviewersFromReviewsId);
-router.get("/review/:reviews_id/:user_id",getReviewersFromUserReviewers);
+router.get("/reviewers/:id/:user_id",getReviewersFromUserReviewers);
 router.post("/reviewers",addReviewers);
 router.patch("/reviewers",writeReviews);
 router.delete("/reviewers/:id",deleteReviewers);

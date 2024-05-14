@@ -11,7 +11,7 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/allJournals", getJournals);
+router.get("/journals", getJournals);
 router.get("/journal/:path",getJournalsByPath);
 router.post("/journal",createJournal);
 router.patch("/journal/:path",updateJournal);

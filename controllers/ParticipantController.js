@@ -1,15 +1,6 @@
 import Participant from "../models/ParticipantModel";
 import User from "../models/UserModel";
 import Discussion from "../models/DiscussionModel";
-export const getParticipant = async(req, res) => {
-    try {
-        const response = await Participant.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
-
 export const getParticipantFromDiscussionId = async(req, res) => {
     
     try {

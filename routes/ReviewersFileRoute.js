@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    getReviewersFile,
     getReviewersFileFromReviewersId,
     createReviewersFile,
     updateReviewersFile,
@@ -10,7 +9,6 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/reviewers_file", getReviewersFile);
 router.get("/reviewers_file/:id",getReviewersFileFromReviewersId);
 router.post("/reviewers_file",createReviewersFile);
 router.patch("/reviewers_file/:id",updateReviewersFile);

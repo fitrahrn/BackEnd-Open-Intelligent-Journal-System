@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    getParticipant,
     getParticipantFromDiscussionId,
     getParticipantFromUserId,
     createParticipant,
@@ -11,7 +10,6 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/participant", getParticipant);
 router.get("/participant/:id",getParticipantFromDiscussionId);
 router.get("/participant/user/:id",getParticipantFromUserId);
 router.post("/participant",createParticipant);

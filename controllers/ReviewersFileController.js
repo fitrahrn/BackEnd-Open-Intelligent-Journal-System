@@ -1,13 +1,5 @@
 import ReviewersFile from "../models/ReviewersFileModel.js";
 
-export const getReviewersFile = async(req, res) => {
-    try {
-        const response = await ReviewersFile.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 
 export const getReviewersFileFromReviewersId = async(req, res) => {
     

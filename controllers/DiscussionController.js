@@ -1,14 +1,6 @@
 import Discussion from "../models/DiscussionModel";
 import Reviews from "../models/ReviewsModel";
 
-export const getDiscussion = async(req, res) => {
-    try {
-        const response = await Discussion.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 
 export const getDiscussionFromReviewsId = async(req, res) => {
     

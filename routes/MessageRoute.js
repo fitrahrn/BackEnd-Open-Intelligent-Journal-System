@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    getMessage,
     getMessageFromDiscussionId,
     getMessageFromParticipantId,
     createMessage,
@@ -11,7 +10,6 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/message", getMessage);
 router.get("/message/:id",getMessageFromDiscussionId);
 router.get("/message/participant/:id",getMessageFromParticipantId);
 router.post("/message",createMessage);

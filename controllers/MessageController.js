@@ -1,15 +1,6 @@
 import Message from "../models/MessageModel";
 import Participant from "../models/ParticipantModel";
 import Discussion from "../models/DiscussionModel";
-export const getMessage = async(req, res) => {
-    try {
-        const response = await Message.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
-
 export const getMessageFromDiscussionId = async(req, res) => {
     
     try {
