@@ -12,7 +12,7 @@ const router = express.Router();
 // buat endpoint
 router.post('/login', login);
 router.post('/register', register);
-router.delete('/logout', logout);
+router.post('/logout', logout);
 router.get('/users', verifyToken, getUsers);
 router.get('/token', refreshToken);
 export default router;
