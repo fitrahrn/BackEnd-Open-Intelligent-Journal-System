@@ -13,8 +13,8 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 const router = express.Router();
 
 router.get("/article/:id", getArticleById);
-router.get("/journal/:journal/:volume/:number",getArticlesByIssue);
-router.get("/journal/:journal/article",getArticlesByJournal);
+router.get("/articles/:journal/:volume/:number",getArticlesByIssue);
+router.get("/articles/:journal",getArticlesByJournal);
 router.post("/article/search/:title",getArticlesByTitle);
 router.post("/article/:journal",createArticle);
 router.patch("/article/:id",updateArticle);
