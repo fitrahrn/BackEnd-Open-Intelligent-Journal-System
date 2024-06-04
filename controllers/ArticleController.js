@@ -27,6 +27,31 @@ export const getArticleById = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
+export const getArticleByUser = async(req, res) => {
+    const username = req.cookies.username;
+    console.log(username)
+    try {
+        const userResponse = await User.findOne({
+            where : {
+                username : username
+            }
+        })
+        const response = await Contributors.findAll({
+            where : {
+                user_id : userResponse[i].dataValues.user_id
+            },
+            include:[{
+                model:Article,
+                required: true,
+            }],
+
+        });
+        
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
 export const getArticlesByTitle = async(req, res) => {
     const { title} = req.body;
     try {

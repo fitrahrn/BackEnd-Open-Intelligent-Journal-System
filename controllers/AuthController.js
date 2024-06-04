@@ -49,20 +49,21 @@ export const login = async (req, res) => {
         const name = user.name;
         const email = user.email;
         const username= user.username;
-        const accessToken = jwt.sign({user_id, name, email, username}, "f3m8r2y7y847nrm9843n6xc94cm83x4mo437",{
+        const accessToken = jwt.sign({user_id, name, email, username}, process.env.TOKEN_SECRET,{
             expiresIn: '20s'
         });
         const refreshToken = jwt.sign({user_id, name, email, username}, "x2m49rymx748m8xg6943xm38fx93fg8gmf9x",{
             expiresIn: '1d'
         });
-        res.cookie('refreshToken', refreshToken,{
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000
-        });
         res.cookie('username', username,{
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000
         });
+        res.cookie('refreshToken', refreshToken,{
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
         res.json({ accessToken });
     } catch (error) {
         res.status(404).json({msg: "Login failed"});

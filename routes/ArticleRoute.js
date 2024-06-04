@@ -4,6 +4,7 @@ import {
     getArticlesByIssue,
     getArticlesByJournal,
     getArticlesByTitle,
+    getArticleByUser,
     createArticle,
     updateArticle,
     deleteArticle,
@@ -13,6 +14,7 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 const router = express.Router();
 
 router.get("/article/:id", getArticleById);
+router.get("/articles/submission",verifyToken,getArticleByUser);
 router.get("/articles/:journal/:volume/:number",getArticlesByIssue);
 router.get("/articles/:journal",getArticlesByJournal);
 router.post("/article/search/:title",getArticlesByTitle);

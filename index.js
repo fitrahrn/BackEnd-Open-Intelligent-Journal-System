@@ -12,11 +12,23 @@ import ContributorsRoute from "./routes/ContributorsRoute.js"
 import ReviewsRoute from "./routes/ReviewsRoute.js"
 import ReviewersRoute from "./routes/ReviewersRoute.js"
 import ReviewersFileRoute from "./routes/ReviewersFileRoute.js";
+import dotenv from "dotenv";
 
 const app = express(); 
 const PORT = 3001; 
+const corsOptions = {
+    // set origin to a specific origin.
+    origin: 'http://localhost:3000',
+    
+    // or, set origin to true to reflect the request origin
+    //origin: true,
   
-app.use(cors());
+    credentials: true,
+    optionsSuccessStatus: 200,
+  };  
+
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(FileUpload());
@@ -30,7 +42,9 @@ app.use(ContributorsRoute);
 app.use(ReviewsRoute);
 app.use(ReviewersRoute);
 app.use(ReviewersFileRoute);
-
+dotenv.config();
+    // access config var
+process.env.TOKEN_SECRET;
 
 
 app.listen(PORT, (error) =>{ 
