@@ -12,7 +12,7 @@ export const refreshToken = async(req, res) => {
             }
         });
         if(!user) return res.sendStatus(403);
-        jwt.verify(refreshToken, "x2m49rymx748m8xg6943xm38fx93fg8gmf9x", (err, decoded) => {
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, decoded) => {
             if(err) return res.sendStatus(403);
             const userId = user.id;
             const name = user.name;

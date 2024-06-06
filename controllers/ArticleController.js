@@ -1,4 +1,5 @@
 import path from "path"
+import fs from "fs"
 import { Op } from "sequelize";
 import Article from "../models/ArticleModel.js"
 import Journal from "../models/JournalModel.js"
@@ -29,7 +30,6 @@ export const getArticleById = async(req, res) => {
 }
 export const getArticleByUser = async(req, res) => {
     const username = req.cookies.username;
-    console.log(username)
     try {
         const userResponse = await User.findOne({
             where : {
@@ -38,15 +38,25 @@ export const getArticleByUser = async(req, res) => {
         })
         const response = await Contributors.findAll({
             where : {
-                user_id : userResponse[i].dataValues.user_id
+                user_id : userResponse.dataValues.user_id
             },
             include:[{
                 model:Article,
                 required: true,
+                order: [['journal_id', 'DESC']],
+                
             }],
-
         });
-        
+        for(let i=0;i<response.length;i++){
+            const journalResponse = await Journal.findOne({
+                where : {
+                    journal_id: response[i].dataValues.article.journal_id
+                },
+
+            });
+            response[i].dataValues.journal_title= journalResponse.dataValues.title
+        }
+
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -109,9 +119,7 @@ export const getArticlesByJournal = async(req, res) => {
 
         });
         let articles = [];
-        console.log(response.length)
         for(let i=0;i<response.length;i++){
-            console.log(response[i].dataValues.article_id)
             const authorResponse = await Contributors.findAll({
                 where : {
                     article_id : response[i].dataValues.article_id
@@ -145,8 +153,8 @@ export const getArticlesByJournal = async(req, res) => {
 }
 
 export const createArticle = async (req, res) => {
-    const {prefix,title,subtitle,abstract,keywords,article_path} = req.body;
-    if (!(title && abstract && article_path)) return res.status(400).json({msg: "All input is required"});
+    const {prefix,title,subtitle,abstract,keywords,contributors} = req.body;
+    if (!(title && abstract)) return res.status(400).json({msg: "All input is required"});
     const username = req.cookies.username;
     const checkTitle = await Article.findOne({
         where: {
@@ -172,63 +180,141 @@ export const createArticle = async (req, res) => {
             [Op.and]:{
                 journal_id: findJournal.dataValues.journal_id,
                 date_published : {
-                    [Op.lt]:'2000-%'
+                    [Op.lt]:'2001-01-02'
                 },
                 appear: false
             }
         }
     });
+    const findLastArticle = await Article.findAll();
     if (!findIssue) return res.status(409).json({msg: "No unpublished issue found"});
+    const file = req.files.file;
+    const fileSize = file.data.length;
+    const extension = path.extname(file.name);
+    const fileName = "Article-"+file.md5 + extension;
+    const file_path = `${req.protocol}://${req.get("host")}/articles/${fileName}`;
+    const allowedType = ['.pdf', '.doc', '.docx','.xml'];
     
-    try {
-        const article = await Article.create({
-            journal_id : findJournal.dataValues.journal_id,
-            issue_id : findIssue.dataValues.issue_id,
-            prefix: prefix,
-            title: title,
-            subtitle : subtitle,
-            abstract : abstract,
-            article_path : article_path,
-            comment : "",
-            keywords : keywords,
-            workflow_phase: "submitted",
-            status: "not reviewed"
-        });
-        await Contributors.create({
-            article_id: article.article_id,
-            user_id: findUser.dataValues.user_id,
-        })
-        res.status(200).json({msg: "Article created successfully",
-            data: {
+    if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});
+    if(fileSize > 15000000) return res.status(422).json({msg : "Size of document must be less than 10 MB"});
+    file.mv(`./public/articles/${fileName}`, async (error) => {
+        if (error) return res.status(500).json({ msg: error.message });
+        try {
+            const article = await Article.create({
+                article_id: findLastArticle.pop().dataValues.article_id+1,
                 journal_id : findJournal.dataValues.journal_id,
                 issue_id : findIssue.dataValues.issue_id,
                 prefix: prefix,
                 title: title,
                 subtitle : subtitle,
                 abstract : abstract,
-                article_path : article_path,
+                article_path : file_path,
                 comment : "",
                 keywords : keywords,
                 workflow_phase: "submitted",
                 status: "not reviewed"
+            });
+            console.log(article)
+            await Contributors.create({
+                article_id: article.dataValues.article_id,
+                user_id: findUser.dataValues.user_id,
+            })
+            if(contributors !== "0"){
+                await Contributors.create({
+                    article_id: article.dataValues.article_id,
+                    user_id: contributors,
+                })
             }
-        });
-    } catch (error) {
-        res.status(500).json({msg: "Article failed to create"});
-    }
+            res.status(200).json({msg: "Article created successfully",
+                data: {
+                    article_id: findLastArticle.pop().dataValues.article_id+1,
+                    journal_id : findJournal.dataValues.journal_id,
+                    issue_id : findIssue.dataValues.issue_id,
+                    prefix: prefix,
+                    title: title,
+                    subtitle : subtitle,
+                    abstract : abstract,
+                    article_path : file_path,
+                    comment : "",
+                    keywords : keywords,
+                    workflow_phase: "submitted",
+                    status: "not reviewed"
+                }
+            });
+        } catch (error) {
+            res.status(500).json({msg: "Article failed to create",error:error.message});
+        }
+    });
+    
 }
 export const updateArticle = async (req, res) => {
+    const article = await Article.findOne({
+        where : {
+            article_id : req.params.id
+        }
+    });
+    if(!article) return res.status(404).json({msg : "No Article Found"});
+    let article_path = article.article_path
+    const article_path_split = article_path.split("/");
+    let fileName = ""
 
+    if(req.files === null) {
+        fileName = article_path_split[article_path_split.length - 1]
+    } else {
+        // user mengupload song baru
+        // buat nama file (md5) baru juga
+        const file = req.files.file;
+        const fileSize = file.data.length;
+        const extension = path.extname(file.name);
+        const fileName = "Article-"+file.md5 + extension;
+        const allowedType = ['.pdf', '.doc', '.docx','.xml'];
+        
+        // validasi
+        if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});
+        if(fileSize > 15000000) return res.status(422).json({msg : "Size of document must be less than 10 MB"});
+        // hapus yang lama
+        if(article_path_split[article_path_split.length - 1] != ''){
+            const filepath = `./public/articles/${article_path_split[article_path_split.length - 1]}`;
+            fs.unlinkSync(filepath);
+        }
+
+        // terima jurnalnya masukkan ke public
+        file.mv(`./public/articles/${fileName}`, (error) => {
+            if (error) return res.status(500).json({ msg: error.message });
+        });
+        article_path = `${req.protocol}://${req.get("host")}/articles/${fileName}`;
+    }
     try {
-        await Article.update(req.body, {
+        await Article.update({
+            prefix: req.body.prefix,
+            title: req.body.title,
+            subtitle : req.body.subtitle,
+            abstract : req.body.abstract,
+            article_path : article_path,
+            comment :req.body.comment,
+            keywords : req.body.keywords,
+            workflow_phase: req.body.workflow_phase,
+            status: req.body.status
+        }, {
             where : {
                 article_id: req.params.id
             }
         });
         res.status(200).json({msg: "Article updated",
-            data: req.body
+            data: {
+                prefix: req.body.prefix,
+                title: req.body.title,
+                subtitle : req.body.subtitle,
+                abstract : req.body.abstract,
+                article_path : article_path,
+                comment :req.body.comment,
+                keywords : req.body.keywords,
+                workflow_phase: req.body.workflow_phase,
+                status: req.body.status
+            }
         });
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({msg: "Article failed to update"});
     }
 }

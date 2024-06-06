@@ -1,7 +1,7 @@
 import express from "express";
 import {
     getJournals,
-    getJournalsById,
+    getJournalsByUser,
     getJournalsByPath,
     createJournal,
     updateJournal,
@@ -13,6 +13,7 @@ const router = express.Router();
 
 router.get("/journals", getJournals);
 router.get("/journal/:path",getJournalsByPath);
+router.get("/journal",getJournalsByUser);
 router.post("/journal",createJournal);
 router.patch("/journal/:path",updateJournal);
 router.delete("/journal/:path",deleteJournal);

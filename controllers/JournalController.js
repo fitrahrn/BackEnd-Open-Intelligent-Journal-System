@@ -1,7 +1,9 @@
 import Journal from "../models/JournalModel.js"
 import path from "path"
 import fs from "fs"
-
+import { Op } from "sequelize";
+import User from "../models/UserModel.js"
+import Role from "../models/RoleModel.js"
 export const getJournals = async(req, res) => {
     try {
         const response = await Journal.findAll(); // seluruh atribut same as SELECT * FROM
@@ -28,6 +30,32 @@ export const getJournalsByPath = async(req, res) => {
             where : {
                 path : req.params.path
             }
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
+export const getJournalsByUser = async(req, res) => {
+    const username = req.cookies.username;
+    try {
+        const userResponse = await User.findOne({
+            where : {
+                username : username
+            }
+        })
+        const response = await Role.findAll({
+            where : {
+                [Op.and]:{
+                    user_id : userResponse.dataValues.user_id,
+                    author : 1
+                }
+            },
+            include:[{
+                model:Journal,
+                required: true,
+                attributes:['path','title'],
+            }],
         });
         res.status(200).json(response);
     } catch (error) {
@@ -129,7 +157,7 @@ export const updateJournal = async (req, res) => {
             path : req.params.path
         }
     });
-    if(!journal) return res.status(404).json({msg : "No Song Found"});
+    if(!journal) return res.status(404).json({msg : "No Journal Found"});
     let image_path = journal.image_path
     const image_path_split = image_path.split("/");
     if(image_path === ""&& req.body.image_path === "") {
@@ -164,7 +192,6 @@ export const updateJournal = async (req, res) => {
         // validasi
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid image format"});
         if(fileSize > 1500000) return res.status(422).json({msg : "Size of image must be less than 1 MB"});
-        console.log(image_path_split)
         // hapus yang lama
         if(image_path_split[image_path_split.length - 1] != ''){
             const filepath = `./public/images/${image_path_split[image_path_split.length - 1]}`;

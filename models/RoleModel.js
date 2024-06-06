@@ -23,17 +23,24 @@ const Role = db.define('role',{
             key: 'journal_id'
         }
     },
-    administrator: DataTypes.INTEGER,
-    lead_editor: DataTypes.INTEGER,
-    editor: DataTypes.INTEGER,
-    reviewer: DataTypes.INTEGER,
-    author: DataTypes.INTEGER,
-    reader: DataTypes.INTEGER,
+    administrator: DataTypes.BOOLEAN,
+    lead_editor: DataTypes.BOOLEAN,
+    editor: DataTypes.BOOLEAN,
+    reviewer: DataTypes.BOOLEAN,
+    author: DataTypes.BOOLEAN,
+    reader: DataTypes.BOOLEAN,
     
 }, {
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
-
+User.hasMany(Role,{foreignKey:'user_id'});
+Role.belongsTo(User,{
+    foreignKey:'user_id'
+});
+Journal.hasMany(Role,{foreignKey:'journal_id'});
+Role.belongsTo(Journal,{
+    foreignKey:'journal_id'
+})
 
 export default Role;

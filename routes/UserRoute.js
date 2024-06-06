@@ -3,6 +3,7 @@ import {
     getUserId,
     getUserByEmail,
     getUserByUsername,
+    getUserWithoutItself,
     findUserByName
 } from "../controllers/UserController.js"
 import {verifyToken} from "../middleware/VerifyToken.js";
@@ -12,6 +13,7 @@ const router = express.Router();
 router.get('/user_id/:email', verifyToken, getUserId);
 router.get('/user/:email',getUserByEmail);
 router.get('/user/get/:username',getUserByUsername);
+router.get('/get/contributors',getUserWithoutItself);
 router.post('/user/name',findUserByName);
 
 export default router;

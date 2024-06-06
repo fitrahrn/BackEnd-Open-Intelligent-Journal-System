@@ -18,7 +18,7 @@ const app = express();
 const PORT = 3001; 
 const corsOptions = {
     // set origin to a specific origin.
-    origin: 'http://localhost:3000',
+    origin:true,
     
     // or, set origin to true to reflect the request origin
     //origin: true,
