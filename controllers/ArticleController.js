@@ -133,7 +133,8 @@ export const getArticlesByJournal = async(req, res) => {
             });
             //response.author = {}
             for(let j=0;j<authorResponse.length;j++){
-                articles.push(authorResponse[j].dataValues.user.dataValues.name + ', ')
+                if(j<authorResponse.length-1) articles.push(authorResponse[j].dataValues.user.dataValues.name + ', ')
+                else articles.push(authorResponse[j].dataValues.user.dataValues.name)
             }
             response[i].dataValues.authors = articles
             const issueResponse = await Issue.findOne({
@@ -146,6 +147,7 @@ export const getArticlesByJournal = async(req, res) => {
             response[i].dataValues.volume = issueResponse.dataValues.volume
             response[i].dataValues.issue = issueResponse.dataValues.number
         }
+        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
