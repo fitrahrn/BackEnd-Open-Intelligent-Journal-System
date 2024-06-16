@@ -17,8 +17,10 @@ export const getReviewsFromArticleId = async(req, res) => {
                 article_id: req.params.id
             }
         }); // seluruh atribut same as SELECT * FROM
+        
         res.status(200).json(response);
     } catch (error) {
+        console.log(error.message)
         res.status(500).json(error.message);
     }
 }
@@ -44,32 +46,28 @@ export const createReviews = async (req,res)=>{
     try{
         const findPrevReviews = await Reviews.findAll({
             where : {
-                article_id: req.params.id
+                article_id: article_id
             }
         });
         let review_rounds= 1;
-        if (findPrevReviews){
+        if (findPrevReviews.length>0){
             review_rounds = findPrevReviews.pop().dataValues.review_rounds++
         }  
-
+        console.log(review_rounds)
         await Reviews.create({
             article_id:article_id,
             review_rounds: review_rounds,
             article_file_path : article_file_path,
-            review_author: null,
-            review_editor: null 
-            
         });
         res.status(200).json({msg: "New review created successfully",
             data: {
                 article_id:article_id,
                 review_rounds: review_rounds,
-                article_file_path : article_file_path,
-                review_author: null,
-                review_editor: null 
+                article_file_path : article_file_path, 
             }
         });
     } catch (error) {
+        console.log(error.message)
         res.status(500).json({msg: "New review failed to create"});
     }
 }

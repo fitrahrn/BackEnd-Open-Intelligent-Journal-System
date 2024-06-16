@@ -12,6 +12,7 @@ import ContributorsRoute from "./routes/ContributorsRoute.js"
 import ReviewsRoute from "./routes/ReviewsRoute.js"
 import ReviewersRoute from "./routes/ReviewersRoute.js"
 import ReviewersFileRoute from "./routes/ReviewersFileRoute.js";
+import ArticleFileRoute from "./routes/ArticleFileRoute.js";
 import dotenv from "dotenv";
 
 const app = express(); 
@@ -42,6 +43,7 @@ app.use(ContributorsRoute);
 app.use(ReviewsRoute);
 app.use(ReviewersRoute);
 app.use(ReviewersFileRoute);
+app.use(ArticleFileRoute);
 dotenv.config();
     // access config var
 process.env.TOKEN_SECRET;
