@@ -147,7 +147,6 @@ export const getArticlesByJournal = async(req, res) => {
             response[i].dataValues.volume = issueResponse.dataValues.volume
             response[i].dataValues.issue = issueResponse.dataValues.number
         }
-        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -216,7 +215,6 @@ export const createArticle = async (req, res) => {
                 workflow_phase: "submitted",
                 status: "not reviewed"
             });
-            console.log(article)
             await Contributors.create({
                 article_id: article.dataValues.article_id,
                 user_id: findUser.dataValues.user_id,
@@ -316,7 +314,6 @@ export const updateArticle = async (req, res) => {
             }
         });
     } catch (error) {
-        console.log(error.message)
         res.status(500).json({msg: "Article failed to update"});
     }
 }

@@ -1,4 +1,5 @@
 import Contributors from "../models/ContributorsModel.js";
+import User from "../models/UserModel.js";
 
 
 export const getContributorsFromArticle = async(req, res) => {
@@ -6,7 +7,12 @@ export const getContributorsFromArticle = async(req, res) => {
         const response = await Contributors.findAll({
             where : {
                 article_id: req.params.id
-            }
+            },
+            include:[{
+                model:User,
+                required: true,
+                attributes:['name'],
+            }],
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
     } catch (error) {
