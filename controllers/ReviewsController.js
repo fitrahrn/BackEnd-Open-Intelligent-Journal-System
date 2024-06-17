@@ -1,5 +1,6 @@
+import Reviewers from "../models/ReviewersModel.js";
 import Reviews from "../models/ReviewsModel.js";
-
+import User from "../models/UserModel.js";
 export const getReviews = async(req, res) => {
     try {
         const response = await Reviews.findAll(); // seluruh atribut same as SELECT * FROM
@@ -15,7 +16,16 @@ export const getReviewsFromArticleId = async(req, res) => {
         const response = await Reviews.findAll({
             where : {
                 article_id: req.params.id
-            }
+            },
+            include:[{
+                model:Reviewers,
+                required: true,
+                include: [{
+                    model:User,
+                    required: true,
+                    attributes:['name']
+                }],
+            }],
         }); // seluruh atribut same as SELECT * FROM
         
         res.status(200).json(response);

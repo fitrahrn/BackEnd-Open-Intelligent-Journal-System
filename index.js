@@ -13,6 +13,7 @@ import ReviewsRoute from "./routes/ReviewsRoute.js"
 import ReviewersRoute from "./routes/ReviewersRoute.js"
 import ReviewersFileRoute from "./routes/ReviewersFileRoute.js";
 import ArticleFileRoute from "./routes/ArticleFileRoute.js";
+import RoleRoute from "./routes/RoleRoute.js";
 import dotenv from "dotenv";
 
 const app = express(); 
@@ -44,6 +45,7 @@ app.use(ReviewsRoute);
 app.use(ReviewersRoute);
 app.use(ReviewersFileRoute);
 app.use(ArticleFileRoute);
+app.use(RoleRoute);
 dotenv.config();
     // access config var
 process.env.TOKEN_SECRET;

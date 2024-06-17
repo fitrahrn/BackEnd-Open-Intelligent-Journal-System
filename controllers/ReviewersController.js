@@ -16,7 +16,12 @@ export const getReviewersFromReviewsId = async(req, res) => {
         const response = await Reviewers.findAll({
             where : {
                 reviews_id: req.params.id
-            }
+            },
+            include:[{
+                model:User,
+                required: true,
+                attributes:['name']
+            }],
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
     } catch (error) {
@@ -40,20 +45,13 @@ export const getReviewersFromUserReviewers = async(req, res) => {
 }
 
 export const addReviewers = async (req,res)=>{
-    const { reviews_id,username,date_assigned,date_due} = req.body;
-    if (!(reviews_id&&username&&date_assigned&&date_due)) return res.status(400).json({msg: "All input is required"});
+    const { reviews_id,user_id,date_assigned,date_due} = req.body;
+    if (!(reviews_id && user_id && date_assigned && date_due)) return res.status(400).json({msg: "All input is required"});
     try{
-        const findUser = await User.findOne({
-            where: {
-                username: username
-            }
-        });
-        if (!findUser) return res.status(409).json({msg: "User not found"});
-     
 
         await Reviewers.create({
             reviews_id: reviews_id,
-            user_id:findUser.dataValues.user_id,
+            user_id:user_id,
             editor_review:null,
             author_review:null,
             recommendation: null,
@@ -65,7 +63,7 @@ export const addReviewers = async (req,res)=>{
         res.status(200).json({msg: "New reviewers added successfully",
             data: {
                 reviews_id: reviews_id,
-                user_id:findUser.dataValues.user_id,
+                user_id:user_id,
                 editor_review:null,
                 author_review:null,
                 recommendation: null,

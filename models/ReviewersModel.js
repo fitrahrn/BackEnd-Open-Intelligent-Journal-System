@@ -36,5 +36,12 @@ const Reviewers = db.define('reviewers',{
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
 
-
+Reviews.hasMany(Reviewers,{foreignKey:'reviews_id'});
+Reviewers.belongsTo(Reviews,{
+    foreignKey:'reviews_id'
+});
+User.hasMany(Reviewers,{foreignKey:'user_id'});
+Reviewers.belongsTo(User,{
+    foreignKey:'user_id'
+});
 export default Reviewers;
