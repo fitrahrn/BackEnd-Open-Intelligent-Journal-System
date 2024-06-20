@@ -16,6 +16,7 @@ const ArticleFile = db.define('article_file',{
         }
     },
     article_path: DataTypes.STRING,
+    phase:DataTypes.STRING
 
 
 }, {

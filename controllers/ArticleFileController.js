@@ -1,5 +1,5 @@
 import ArticleFile from "../models/ArticleFileModel.js";
-
+import { Op } from "sequelize";
 
 export const getArticleFileFromArticleId = async(req, res) => {
     
@@ -15,21 +15,42 @@ export const getArticleFileFromArticleId = async(req, res) => {
     }
 }
 
+export const getArticleFileFromPhase = async(req, res) => {
+    const {phase} = req.body;
+    try {
+        const response = await ArticleFile.findAll({
+            where : {
+                [Op.and]:{
+                    article_id: req.params.id,
+                    phase : phase 
+                }
+            }
+        }); // seluruh atribut same as SELECT * FROM
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json(error.message);
+    }
+}
+
+
 
 export const createArticleFile = async (req,res)=>{
-    const { article_id,article_path} = req.body;
+    const { article_id,article_path,phase} = req.body;
     if (!(article_id)) return res.status(400).json({msg: "All input is required"});
     try{
 
         await ArticleFile.create({
             article_id:article_id,
-            article_path:article_path
+            article_path:article_path,
+            phase:phase
             
         });
         res.status(200).json({msg: "New article file added successfully",
             data: {
                 article_id:article_id,
-                article_path:article_path
+                article_path:article_path,
+                phase:phase
             }
         });
     } catch (error) {

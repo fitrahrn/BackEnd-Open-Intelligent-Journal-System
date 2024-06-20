@@ -11,7 +11,7 @@ export const getContributorsFromArticle = async(req, res) => {
             include:[{
                 model:User,
                 required: true,
-                attributes:['name'],
+                attributes:['user_id','name','email'],
             }],
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);

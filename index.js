@@ -14,6 +14,7 @@ import ReviewersRoute from "./routes/ReviewersRoute.js"
 import ReviewersFileRoute from "./routes/ReviewersFileRoute.js";
 import ArticleFileRoute from "./routes/ArticleFileRoute.js";
 import RoleRoute from "./routes/RoleRoute.js";
+import DiscussionRoute from "./routes/DiscussionRoute.js";
 import dotenv from "dotenv";
 
 const app = express(); 
@@ -45,6 +46,7 @@ app.use(ReviewsRoute);
 app.use(ReviewersRoute);
 app.use(ReviewersFileRoute);
 app.use(ArticleFileRoute);
+app.use(DiscussionRoute);
 app.use(RoleRoute);
 dotenv.config();
     // access config var
