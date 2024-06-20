@@ -1,3 +1,4 @@
+import Article from "../models/ArticleModel.js";
 import Reviewers from "../models/ReviewersModel.js";
 import Reviews from "../models/ReviewsModel.js";
 import User from "../models/UserModel.js";
@@ -18,19 +19,13 @@ export const getReviewsFromArticleId = async(req, res) => {
                 article_id: req.params.id
             },
             include:[{
-                model:Reviewers,
+                model:Article,
                 required: true,
-                include: [{
-                    model:User,
-                    required: true,
-                    attributes:['name']
-                }],
             }],
         }); // seluruh atribut same as SELECT * FROM
         
         res.status(200).json(response);
     } catch (error) {
-        console.log(error.message)
         res.status(500).json(error.message);
     }
 }
@@ -77,7 +72,6 @@ export const createReviews = async (req,res)=>{
             }
         });
     } catch (error) {
-        console.log(error.message)
         res.status(500).json({msg: "New review failed to create"});
     }
 }

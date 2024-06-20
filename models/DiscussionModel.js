@@ -17,7 +17,7 @@ const Discussion = db.define('discussion',{
         }
     },
     subject: DataTypes.STRING,
-    url_path: DataTypes.STRING
+    closed:DataTypes.BOOLEAN
 
 }, {
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel

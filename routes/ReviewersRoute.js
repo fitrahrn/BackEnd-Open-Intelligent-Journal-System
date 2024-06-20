@@ -1,6 +1,7 @@
 import express from "express";
 import {
     getReviewers,
+    getReviewersFromUser,
     getReviewersFromReviewsId,
     getReviewersFromUserReviewers,
     addReviewers,
@@ -12,8 +13,9 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 const router = express.Router();
 
 router.get("/reviewers", getReviewers);
+router.get("/reviewers/review", getReviewersFromUser);
 router.get("/reviewers/:id",getReviewersFromReviewsId);
-router.get("/reviewers/:id/:user_id",getReviewersFromUserReviewers);
+router.get("/reviewers/user/:id",getReviewersFromUserReviewers);
 router.post("/reviewers",addReviewers);
 router.patch("/reviewers",writeReviews);
 router.delete("/reviewers/:id",deleteReviewers);

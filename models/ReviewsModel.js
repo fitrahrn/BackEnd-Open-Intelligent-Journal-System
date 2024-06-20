@@ -21,6 +21,9 @@ const Reviews = db.define('reviews',{
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
-
+Article.hasMany(Reviews,{foreignKey:'article_id'});
+Reviews.belongsTo(Article,{
+    foreignKey:'article_id'
+});
 
 export default Reviews;
