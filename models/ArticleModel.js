@@ -37,6 +37,9 @@ const Article = db.define('article',{
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
     timestamps : false // agar gak ngequery createdAt and updatedAt
 });
-
+Journal.hasMany(Article,{foreignKey:'journal_id'});
+Article.belongsTo(Journal,{
+    foreignKey:'journal_id'
+});
 
 export default Article;

@@ -20,7 +20,7 @@ const User = db.define('user', {
     password : DataTypes.STRING,
     phone: DataTypes.STRING,
     orcid_id: DataTypes.STRING,
-    affliation: DataTypes.STRING,
+    affiliation: DataTypes.STRING,
     mailing_address: DataTypes.STRING,
     signature: DataTypes.STRING,
     country:DataTypes.STRING,

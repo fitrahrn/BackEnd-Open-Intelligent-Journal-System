@@ -1,9 +1,9 @@
 import User from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import Role from "../models/RoleModel.js";
 export const register = async (req, res) => {
-    const { name,public_name, username, email, password, confPassword,phone, orcid_id, affiliation, mailing_address,signature,country } = req.body;
+    const { name,public_name, username, email, password, confPassword,phone, orcid_id, affiliation, mailing_address,signature,country,journal_id } = req.body;
     if (!(name && username && email && password && confPassword)) return res.status(400).json({msg: "All input is required"});
     if (password !== confPassword) return res.status(400).json({msg: "Password and Confirm Password don't match"});
 
@@ -17,7 +17,7 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
     try {
-        await User.create({
+        const user = await User.create({
             name: name,
             public_name: public_name,
             username: username,
@@ -29,6 +29,15 @@ export const register = async (req, res) => {
             mailing_address: mailing_address,
             signature:signature,
             country:country,
+        });
+        await Role.create({
+            user_id: user.dataValues.user_id,
+            journal_id: journal_id,
+            administrator: false,
+            lead_editor:false,
+            reviewer: false,
+            author:false,
+            reader:true
         });
         res.status(200).json({msg: "Registration Successful"});
     } catch (error) {

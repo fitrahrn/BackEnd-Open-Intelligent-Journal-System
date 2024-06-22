@@ -21,8 +21,39 @@ export const getArticleById = async(req, res) => {
         const response = await Article.findOne({
             where : {
                 article_id : req.params.id
-            }
+            },
+            include:[{
+                model:Journal,
+                required: true,
+                attributes: ['title']
+            }],
         });
+        let articles = [];
+        const authorResponse = await Contributors.findAll({
+            where : {
+                article_id : response.dataValues.article_id
+            },
+            include:[{
+                model:User,
+                required: true,
+            }],
+
+        });
+        //response.author = {}
+        for(let j=0;j<authorResponse.length;j++){
+            articles.push(authorResponse[j].dataValues.user)
+        }
+        response.dataValues.authors = articles
+        response.dataValues.journal_title = response.dataValues.journal.dataValues.title
+        const issueResponse = await Issue.findOne({
+            where : {
+                issue_id : response.dataValues.issue_id
+            }
+
+        });
+        response.dataValues.year = issueResponse.dataValues.year
+        response.dataValues.volume = issueResponse.dataValues.volume
+        response.dataValues.issue = issueResponse.dataValues.number
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);

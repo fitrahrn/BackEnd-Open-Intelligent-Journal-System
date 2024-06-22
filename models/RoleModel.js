@@ -29,6 +29,7 @@ const Role = db.define('role',{
     reviewer: DataTypes.BOOLEAN,
     author: DataTypes.BOOLEAN,
     reader: DataTypes.BOOLEAN,
+    request: DataTypes.STRING
     
 }, {
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel
