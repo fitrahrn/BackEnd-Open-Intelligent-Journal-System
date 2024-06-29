@@ -25,9 +25,11 @@ const corsOptions = {
     
     // or, set origin to true to reflect the request origin
     //origin: true,
-  
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 200,
+    allowedHeaders: ['Content-Type', 'Authorization','Origin','X-Requested-With','Accept','x-access-token'],
+    
   };  
 
 
@@ -60,3 +62,5 @@ app.listen(PORT, (error) =>{
         console.log("Error occurred, server can't start", error); 
     } 
 ); 
+
+export default app;

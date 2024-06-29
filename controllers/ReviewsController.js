@@ -23,7 +23,7 @@ export const getReviewsFromArticleId = async(req, res) => {
                 required: true,
             }],
         }); // seluruh atribut same as SELECT * FROM
-        
+        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -39,6 +39,7 @@ export const getReviewFromReviewRounds = async(req, res) => {
                 review_rounds: req.params.rounds
             }
         }); // seluruh atribut same as SELECT * FROM
+        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);

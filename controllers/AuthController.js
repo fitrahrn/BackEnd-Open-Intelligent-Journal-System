@@ -2,6 +2,7 @@ import User from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Role from "../models/RoleModel.js";
+let token;
 export const register = async (req, res) => {
     const { name,public_name, username, email, password, confPassword,phone, orcid_id, affiliation, mailing_address,signature,country,journal_id } = req.body;
     if (!(name && username && email && password && confPassword)) return res.status(400).json({msg: "All input is required"});
@@ -46,14 +47,17 @@ export const register = async (req, res) => {
 }
 
 export const login = async (req, res) => {
+    const {email, password } = req.body;
+    if (!(email && password)) return res.status(400).json({msg: "All input is required"});
+    const user = await User.findOne({
+        where:{
+            email: email
+        }
+    });
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if(!match) return res.status(400).json({msg: "Wrong Password"});
     try {
-        const user = await User.findOne({
-            where:{
-                email: req.body.email
-            }
-        });
-        const match = await bcrypt.compare(req.body.password, user.password);
-        if(!match) return res.status(400).json({msg: "Wrong Password"});
+        
         const user_id = user.user_id;
         const name = user.name;
         const email = user.email;
@@ -66,16 +70,20 @@ export const login = async (req, res) => {
         });
         res.cookie('username', username,{
             httpOnly: true,
+            sameSite: "None",
+
             maxAge: 24 * 60 * 60 * 1000
         });
         res.cookie('refreshToken', refreshToken,{
             httpOnly: true,
+            sameSite: "None",
+
             maxAge: 24 * 60 * 60 * 1000
         });
-
+        token=accessToken; 
         res.status(200).json({ accessToken });
     } catch (error) {
-        res.status(404).json({msg: "Login failed"});
+        res.status(500).json({msg: "Login failed"});
     }
 }
 
@@ -102,3 +110,13 @@ export const getUsers = async(req, res) => {
         console.log(error);
     }
 }
+// export const addHeader = (req, res, next) => {
+
+//     if (!token) {
+//       console.log('token: undefined');
+//     } else {
+//       req.headers.authorization = 'Bearer ' + token; 
+//     }
+    
+//     next();
+//   }
