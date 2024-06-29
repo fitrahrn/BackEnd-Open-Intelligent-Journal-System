@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "set PORT=0&& node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit --runInBand"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,11 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "sequelize-mock": "^0.10.2",
     "supertest": "^7.0.0"
+  },
+  "jest": {
+    "transform": {}
   }
+  
 }

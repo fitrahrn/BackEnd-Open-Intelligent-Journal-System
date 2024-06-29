@@ -54,6 +54,7 @@ export const login = async (req, res) => {
             email: email
         }
     });
+    if(!user) return res.status(400).json({msg: "User not found"});
     const match = await bcrypt.compare(req.body.password, user.password);
     if(!match) return res.status(400).json({msg: "Wrong Password"});
     try {
@@ -110,13 +111,3 @@ export const getUsers = async(req, res) => {
         console.log(error);
     }
 }
-// export const addHeader = (req, res, next) => {
-
-//     if (!token) {
-//       console.log('token: undefined');
-//     } else {
-//       req.headers.authorization = 'Bearer ' + token; 
-//     }
-    
-//     next();
-//   }

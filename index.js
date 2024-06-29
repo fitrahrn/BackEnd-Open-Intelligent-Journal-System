@@ -18,7 +18,7 @@ import DiscussionRoute from "./routes/DiscussionRoute.js";
 import dotenv from "dotenv";
 
 const app = express(); 
-const PORT = 3001; 
+const PORT = process.env.PORT || 3001;
 const corsOptions = {
     // set origin to a specific origin.
     origin:true,
