@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    getReviewers,
     getReviewersFromUser,
     getReviewersFromReviewsId,
     getReviewersFromUserReviewers,
@@ -12,7 +11,6 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/reviewers", getReviewers);
 router.get("/reviewers/review", getReviewersFromUser);
 router.get("/reviewers/:id",getReviewersFromReviewsId);
 router.get("/reviewers/user/:id",getReviewersFromUserReviewers);

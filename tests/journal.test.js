@@ -5,112 +5,206 @@ import Journal from "../models/JournalModel.js";
 import SequelizeMock from "sequelize-mock";
 import User from "../models/UserModel.js";
 import Role from "../models/RoleModel.js";
-
+import path from "path"
+import fs from "fs"
 // Setup Sequelize Mock for the Journal model
 const DBConnectionMock = new SequelizeMock();
-
-
+const array_journal=[
+        {
+            journal_id: 1,
+            title: "Journal of ICT Research and Applications",
+            initials: "jictra",
+            abbreviation: "jictra",
+            description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+            path: "jictra",
+            image_path:"http://localhost:3001/images/jictra.png",
+            languages: "Indonesia",
+            appear: 0,
+            publisher: "Institute for Research and Community Services, Ins",
+            issn: "2337-5787",
+            e_issn: "2338-5499",
+            reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+        },
+        {
+            journal_id: 2,
+            title: "Journal of ICT Research and Applications",
+            initials: "jictra",
+            abbreviation: "jictra",
+            description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+            path: "jictra",
+            image_path:"http://localhost:3001/images/jictra.png",
+            languages: "Indonesia",
+            appear: 0,
+            publisher: "Institute for Research and Community Services, Ins",
+            issn: "2337-5787",
+            e_issn: "2338-5499",
+            reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+            
+        }
+    ]
+const single_journal = {
+        journal_id: 1,
+        title: "Journal of ICT Research and Applications",
+        initials: "jictra",
+        abbreviation: "jictra",
+        description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+        path: "jictra",
+        image_path:"http://localhost:3001/images/jictra.png",
+        languages: "Indonesia",
+        appear: 0,
+        publisher: "Institute for Research and Community Services, Ins",
+        issn: "2337-5787",
+        e_issn: "2338-5499",
+        reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+    }
+const single_journal_without_image = {
+    journal_id: 1,
+    title: "Journal of ICT Research and Applications",
+    initials: "jictra",
+    abbreviation: "jictra",
+    description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+    path: "jictra",
+    image_path:"",
+    languages: "Indonesia",
+    appear: 0,
+    publisher: "Institute for Research and Community Services, Ins",
+    issn: "2337-5787",
+    e_issn: "2338-5499",
+    reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+}
+const response_journal_without_image = {
+    title: "Journal of ICT Research and Applications",
+    initials: "jictra",
+    abbreviation: "jictra",
+    description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+    path: "jictra",
+    languages: "Indonesia",
+    appear: "0",
+    publisher: "Institute for Research and Community Services, Ins",
+    issn: "2337-5787",
+    e_issn: "2338-5499",
+    reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+}
+const update_journal = {
+    title: "Journal of Engineering and Technological Sciences",
+    initials: "jictra",
+    abbreviation: "jictra",
+    description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+    journal_path: "jictra",
+    languages: "Indonesia",
+    appear: "0",
+    publisher: "Institute for Research and Community Services, Ins",
+    issn: "2337-5787",
+    e_issn: "2338-5499",
+    reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+}
+const single_user = {dataValues:{
+            user_id: 1,
+            name: 'John Doe',
+            public_name: 'John Doe',
+            username: 'johndoe',
+            email: 'test@example.com',
+            password: '$2b$10$somethinghashed',
+            phone: "08123445678",
+            orcid_id: "2189-9178",
+            affiliation: "Universitas Gadjah Mada",
+            mailing_address: "test@example.com",
+            signature: "johndoe",
+            country:"United States of America",
+            profile_picture: "./profile_picture.jpg"
+        }
+    }
+const array_role=[
+    {
+        role_id: 1,
+        user_id:1,
+        journal_id:1,
+        administrator: false,
+        lead_editor:false,
+        reviewer: false,
+        author:true,
+        reader:true
+    },
+    {
+        role_id: 1,
+        user_id:1,
+        journal_id:2,
+        administrator: false,
+        lead_editor:false,
+        reviewer: true,
+        author:false,
+        reader:true
+    }
+]
+const array_role_with_journal=[
+    {
+        role_id: 1,
+        user_id:1,
+        journal_id:1,
+        administrator: false,
+        lead_editor:false,
+        reviewer: false,
+        author:true,
+        reader:true,
+        journal:{
+            journal_id: 1,
+            title: "Journal of ICT Research and Applications",
+            initials: "jictra",
+            abbreviation: "jictra",
+            description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+            path: "jictra",
+            image_path:"http://localhost:3001/images/jictra.png",
+            languages: "Indonesia",
+            appear: 0,
+            publisher: "Institute for Research and Community Services, Ins",
+            issn: "2337-5787",
+            e_issn: "2338-5499",
+            reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+        }
+    },
+    {
+        role_id: 1,
+        user_id:1,
+        journal_id:2,
+        administrator: false,
+        lead_editor:false,
+        reviewer: true,
+        author:false,
+        reader:true,
+        journal:{
+            journal_id: 2,
+            title: "Journal of ICT Research and Applications",
+            initials: "jictra",
+            abbreviation: "jictra",
+            description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
+            path: "jictra",
+            image_path:"http://localhost:3001/images/jictra.png",
+            languages: "Indonesia",
+            appear: 0,
+            publisher: "Institute for Research and Community Services, Ins",
+            issn: "2337-5787",
+            e_issn: "2338-5499",
+            reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
+        }
+    }
+]
 describe("Journal Controller", () => {
-    describe("getJournals", () => {
-        it("mock findAll", () => {
-            jest.spyOn(Journal, "findAll").mockResolvedValue([{
-                journal_id: 1,
-                title: "Journal of ICT Research and Applications",
-                initials: "jictra",
-                abbreviation: "jictra",
-                description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
-                path: "jictra",
-                image_path:"http://localhost:3001/images/jictra.png",
-                languages: "Indonesia",
-                appear: 0,
-                publisher: "Institute for Research and Community Services, Ins",
-                issn: "2337-5787",
-                e_issn: "2338-5499",
-                reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
-            },
-            {
-                journal_id: 2,
-                title: "Journal of ICT Research and Applications",
-                initials: "jictra",
-                abbreviation: "jictra",
-                description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
-                path: "jictra",
-                image_path:"http://localhost:3001/images/jictra.png",
-                languages: "Indonesia",
-                appear: 0,
-                publisher: "Institute for Research and Community Services, Ins",
-                issn: "2337-5787",
-                e_issn: "2338-5499",
-                reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
-                
-            }
-        ]);
+    describe("GET /journals", () => {
+        it("mock all model", () => {
+            jest.spyOn(Journal, "findAll").mockResolvedValue(array_journal);
+            jest.spyOn(Journal, "findOne").mockResolvedValue(single_journal);
+            jest.spyOn(Journal, "create").mockResolvedValue(single_journal);
+            jest.spyOn(Journal, "update").mockResolvedValue(update_journal);
+            jest.spyOn(Journal, "destroy").mockResolvedValue(1);
+            jest.spyOn(User, "findOne").mockResolvedValue(single_user);
+            jest.spyOn(Role, "findAll").mockResolvedValue(array_role);
+            
         })
         it("should return all journals", async () => {
-            Journal.findAll.mockResolvedValue([{
-                journal_id: 1,
-                title: "Journal of ICT Research and Applications",
-                initials: "jictra",
-                abbreviation: "jictra",
-                description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
-                path: "jictra",
-                image_path:"http://localhost:3001/images/jictra.png",
-                languages: "Indonesia",
-                appear: 0,
-                publisher: "Institute for Research and Community Services, Ins",
-                issn: "2337-5787",
-                e_issn: "2338-5499",
-                reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
-            },
-            {
-                journal_id: 2,
-                title: "Journal of ICT Research and Applications",
-                initials: "jictra",
-                abbreviation: "jictra",
-                description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
-                path: "jictra",
-                image_path:"http://localhost:3001/images/jictra.png",
-                languages: "Indonesia",
-                appear: 0,
-                publisher: "Institute for Research and Community Services, Ins",
-                issn: "2337-5787",
-                e_issn: "2338-5499",
-                reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
-                
-            }]);
+            Journal.findAll.mockResolvedValue(array_journal);
             const res = await request(app).get("/journals");
             expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual([{
-                    journal_id: 1,
-                    title: "Journal of ICT Research and Applications",
-                    initials: "jictra",
-                    abbreviation: "jictra",
-                    description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
-                    path: "jictra",
-                    image_path:"http://localhost:3001/images/jictra.png",
-                    languages: "Indonesia",
-                    appear: 0,
-                    publisher: "Institute for Research and Community Services, Ins",
-                    issn: "2337-5787",
-                    e_issn: "2338-5499",
-                    reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
-                },
-                {
-                    journal_id: 2,
-                    title: "Journal of ICT Research and Applications",
-                    initials: "jictra",
-                    abbreviation: "jictra",
-                    description: "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",
-                    path: "jictra",
-                    image_path:"http://localhost:3001/images/jictra.png",
-                    languages: "Indonesia",
-                    appear: 0,
-                    publisher: "Institute for Research and Community Services, Ins",
-                    issn: "2337-5787",
-                    e_issn: "2338-5499",
-                    reg_number: "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.",
-                    
-                }]);
+            expect(res.body).toEqual(array_journal);
         });
 
         it("should handle errors", async () => {
@@ -121,86 +215,73 @@ describe("Journal Controller", () => {
         });
     });
 
-    describe("getJournalsById", () => {
-        it("should return journal by id", async () => {
-            Journal.findOne.mockResolvedValue(JournalMock.build());
-            const res = await request(app).get("/journals/1");
-            expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual(expect.objectContaining({
-                title: "Sample Journal"
-            }));
-        });
 
-        it("should handle errors", async () => {
-            Journal.findOne.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).get("/journals/1");
-            expect(res.statusCode).toEqual(500);
-            expect(res.body).toEqual("Database Error");
-        });
-    });
-
-    describe("getJournalsByPath", () => {
+    describe("GET /journal/:path", () => {
         it("should return journal by path", async () => {
-            Journal.findOne.mockResolvedValue(JournalMock.build());
-            const res = await request(app).get("/journals/path/sample-journal");
+            Journal.findOne.mockResolvedValue(single_journal);
+            const res = await request(app).get("/journal/jictra");
             expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual(expect.objectContaining({
-                title: "Sample Journal"
-            }));
+            expect(res.body).toEqual(single_journal);
         });
-
+        it("should return 404 if not found", async () => {
+            Journal.findOne.mockRejectedValue(null);
+            const res = await request(app).get("/journals/jmfs");
+            expect(res.statusCode).toEqual(404);
+        });
         it("should handle errors", async () => {
             Journal.findOne.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).get("/journals/path/sample-journal");
+            const res = await request(app).get("/journal/jmfs");
             expect(res.statusCode).toEqual(500);
             expect(res.body).toEqual("Database Error");
         });
     });
 
-    describe("getJournalsByUser", () => {
+    describe("GET /journal cookies username=johndoe", () => {
         it("should return journals by user", async () => {
-            User.findOne.mockResolvedValue({ dataValues: { user_id: 1 } });
-            Role.findAll.mockResolvedValue([{
-                journal: JournalMock.build()
-            }]);
+            User.findOne.mockResolvedValue(single_user);
+            Role.findAll.mockResolvedValue(array_role_with_journal);
 
-            const res = await request(app).get("/journals/user").set("Cookie", "username=testuser");
+            const res = await request(app).get("/journal").set("Cookie", "username=johndoe");
             expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual([expect.objectContaining({
-                journal: expect.objectContaining({
-                    title: "Sample Journal"
-                })
-            })]);
+            expect(res.body).toEqual(array_role_with_journal);
         });
 
         it("should handle errors", async () => {
             User.findOne.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).get("/journals/user").set("Cookie", "username=testuser");
+            const res = await request(app).get("/journals").set("Cookie", "username=testuser");
             expect(res.statusCode).toEqual(500);
             expect(res.body).toEqual("Database Error");
         });
     });
 
-    describe("createJournal", () => {
+    describe("POST /journal", () => {
         it("should create a new journal", async () => {
             Journal.findOne.mockResolvedValue(null);
-            Journal.create.mockResolvedValue(JournalMock.build());
+            Journal.create.mockResolvedValue(single_journal);
 
-            const res = await request(app).post("/journals").send({
-                title: "New Journal",
-                description: "This is a new journal.",
-                journal_path: "new-journal",
-                languages: "English",
-                appear: true
+            const res = await request(app).post("/journal")
+            .field('title', "Journal of ICT Research and Applications")
+            .field('initials', "jictra",)
+            .field('abbreviation', "jictra")
+            .field('description', "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",)
+            .field('journal_path', "jictra")
+            .field('languages', "Indonesia")
+            .field('appear', 0)
+            .field('publisher', "Institute for Research and Community Services, Ins")
+            .field('issn', "2337-5787")
+            .field('e_issn', "2338-5499")
+            .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
+            .attach('file',path.resolve('./public/images/jictra.png'));
+            expect(res.statusCode).toEqual(201);
+            expect(res.body).toEqual({
+                msg: "Journal Created Successfully",
+                data:response_journal_without_image
+
             });
-            expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual(expect.objectContaining({
-                msg: "Journal created successfully"
-            }));
         });
 
         it("should handle validation errors", async () => {
-            const res = await request(app).post("/journals").send({});
+            const res = await request(app).post("/journal").send({});
             expect(res.statusCode).toEqual(400);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "All input is required"
@@ -208,14 +289,20 @@ describe("Journal Controller", () => {
         });
 
         it("should handle existing journal errors", async () => {
-            Journal.findOne.mockResolvedValue(JournalMock.build());
-            const res = await request(app).post("/journals").send({
-                title: "Sample Journal",
-                description: "This is a new journal.",
-                journal_path: "new-journal",
-                languages: "English",
-                appear: true
-            });
+            Journal.findOne.mockResolvedValue(single_journal);
+            const res = await request(app).post("/journal")
+            .field('title', "Journal of ICT Research and Applications")
+            .field('initials', "jictra",)
+            .field('abbreviation', "jictra")
+            .field('description', "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",)
+            .field('journal_path', "jictra")
+            .field('languages', "Indonesia")
+            .field('appear', 0)
+            .field('publisher', "Institute for Research and Community Services, Ins")
+            .field('issn', "2337-5787")
+            .field('e_issn', "2338-5499")
+            .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
+            .attach('image',path.resolve('./public/images/jictra.png'));
             expect(res.statusCode).toEqual(409);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "Journal already exist"
@@ -223,27 +310,59 @@ describe("Journal Controller", () => {
         });
     });
 
-    describe("updateJournal", () => {
-        it("should update an existing journal", async () => {
-            Journal.findOne.mockResolvedValue(JournalMock.build());
-            Journal.update.mockResolvedValue([1]);
+    describe("PATCH /journal/:path", () => {
+        it("should update an existing journal with cover image", async () => {
+            Journal.findOne.mockResolvedValue(single_journal);
+            Journal.update.mockResolvedValue(update_journal);
 
-            const res = await request(app).put("/journals/sample-journal").send({
-                title: "Updated Journal",
-                description: "This is an updated journal.",
-                journal_path: "sample-journal",
-                languages: "English",
-                appear: true
-            });
+            const res = await request(app).patch("/journal/jictra")
+            .field('title', "Journal of Engineering and Technological Sciences")
+            .field('initials', "jictra",)
+            .field('abbreviation', "jictra")
+            .field('description', "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",)
+            .field('journal_path', "jictra")
+            .field('languages', "Indonesia")
+            .field('appear', 0)
+            .field('publisher', "Institute for Research and Community Services, Ins")
+            .field('issn', "2337-5787")
+            .field('e_issn', "2338-5499")
+            .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
+            .attach('file',path.resolve('./public/images/jictra.png'));;
             expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual(expect.objectContaining({
-                msg: "Journal updated"
+            expect(res.body).toEqual(Object({
+                msg: "Journal updated",
+                data: update_journal
+                
             }));
         });
 
-        it("should handle errors", async () => {
+        it("should update an existing journal without cover image", async () => {
+            Journal.findOne.mockResolvedValue(single_journal);
+            Journal.update.mockResolvedValue(update_journal);
+
+            const res = await request(app).patch("/journal/jictra")
+            .field('title', "Journal of Engineering and Technological Sciences")
+            .field('initials', "jictra",)
+            .field('abbreviation', "jictra")
+            .field('description', "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",)
+            .field('journal_path', "jictra")
+            .field('languages', "Indonesia")
+            .field('appear', 0)
+            .field('publisher', "Institute for Research and Community Services, Ins")
+            .field('issn', "2337-5787")
+            .field('e_issn', "2338-5499")
+            .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toEqual(Object({
+                msg: "Journal updated",
+                data: update_journal
+                
+            }));
+        });
+
+        it("should handle journal not found", async () => {
             Journal.findOne.mockResolvedValue(null);
-            const res = await request(app).put("/journals/nonexistent-journal").send({
+            const res = await request(app).patch("/journal/jmfs").send({
                 title: "Updated Journal",
                 description: "This is an updated journal.",
                 journal_path: "sample-journal",
@@ -255,27 +374,54 @@ describe("Journal Controller", () => {
                 msg: "No Journal Found"
             }));
         });
+        it("should handle errors", async () => {
+            Journal.findOne.mockResolvedValue(single_journal);
+            Journal.update.mockRejectedValue(new Error("Database Error"));
+            const res = await request(app).patch("/journal/jictra")
+            .field('title', "Journal of Engineering and Technological Sciences")
+            .field('initials', "jictra",)
+            .field('abbreviation', "jictra")
+            .field('description', "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",)
+            .field('journal_path', "jictra")
+            .field('languages', "Indonesia")
+            .field('appear', 0)
+            .field('publisher', "Institute for Research and Community Services, Ins")
+            .field('issn', "2337-5787")
+            .field('e_issn', "2338-5499")
+            .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
+            expect(res.statusCode).toEqual(500);
+            expect(res.body).toEqual(expect.objectContaining({
+                msg: "Journal failed to update"
+            }));
+        });
     });
 
-    describe("deleteJournal", () => {
+    describe("DELETE /journal/:path", () => {
         it("should delete an existing journal", async () => {
-            Journal.findOne.mockResolvedValue(JournalMock.build());
+            Journal.findOne.mockResolvedValue(single_journal_without_image);
             Journal.destroy.mockResolvedValue(1);
 
-            const res = await request(app).delete("/journals/sample-journal");
+            const res = await request(app).delete("/journal/jictra");
             expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "Journal Deleted Successfully"
             }));
         });
 
-        it("should handle errors", async () => {
+        it("should handle not found", async () => {
             Journal.findOne.mockResolvedValue(null);
-            const res = await request(app).delete("/journals/nonexistent-journal");
+            const res = await request(app).delete("/journal/jmfs");
             expect(res.statusCode).toEqual(404);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "No Journal Found"
             }));
+        });
+        it("should handle error", async () => {
+            Journal.findOne.mockResolvedValue(single_journal_without_image);
+            Journal.destroy.mockRejectedValue(new Error("Database Error"))
+            const res = await request(app).delete("/journal/jictra");
+            expect(res.statusCode).toEqual(500);
+            expect(res.body).toEqual("Database Error");
         });
     });
 });

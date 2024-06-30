@@ -1,15 +1,5 @@
 import Article from "../models/ArticleModel.js";
-import Reviewers from "../models/ReviewersModel.js";
 import Reviews from "../models/ReviewsModel.js";
-import User from "../models/UserModel.js";
-export const getReviews = async(req, res) => {
-    try {
-        const response = await Reviews.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 
 export const getReviewsFromArticleId = async(req, res) => {
     
@@ -23,7 +13,7 @@ export const getReviewsFromArticleId = async(req, res) => {
                 required: true,
             }],
         }); // seluruh atribut same as SELECT * FROM
-        console.log(response)
+        
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -39,7 +29,7 @@ export const getReviewFromReviewRounds = async(req, res) => {
                 review_rounds: req.params.rounds
             }
         }); // seluruh atribut same as SELECT * FROM
-        console.log(response)
+        
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -57,9 +47,8 @@ export const createReviews = async (req,res)=>{
         });
         let review_rounds= 1;
         if (findPrevReviews.length>0){
-            review_rounds = findPrevReviews.pop().dataValues.review_rounds++
+            review_rounds = findPrevReviews.pop().review_rounds +1
         }  
-        console.log(review_rounds)
         await Reviews.create({
             article_id:article_id,
             review_rounds: review_rounds,
@@ -83,11 +72,11 @@ export const updateReviews = async (req,res)=>{
                 reviews_id : req.params.id
             }
         });
-        res.status(200).json({msg: "Jurnal updated",
+        res.status(200).json({msg: "Review updated",
             data: req.body
         });
     } catch (error) {
-        res.status(500).json({msg: "Jurnal failed to update"});
+        res.status(500).json({msg: "Review failed to update"});
     }
 }
 export const deleteReviews= async(req, res) => {

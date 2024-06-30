@@ -12,18 +12,6 @@ export const getJournals = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
-export const getJournalsById = async(req, res) => {
-    try {
-        const response = await Journal.findOne({
-            where : {
-                journal_id : req.params.id
-            }
-        });
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 export const getJournalsByPath = async(req, res) => {
     try {
         const response = await Journal.findOne({
@@ -59,6 +47,7 @@ export const getJournalsByUser = async(req, res) => {
         });
         res.status(200).json(response);
     } catch (error) {
+        console.log(error.message)
         res.status(500).json(error.message);
     }
 }
@@ -107,7 +96,20 @@ export const createJournal = async (req, res) => {
                 reg_number: reg_number,
                 
             });
-              res.status(201).json({ msg: "Jurnal Created Successfully" });
+              res.status(201).json({ msg: "Journal Created Successfully",data:{
+                title: title,
+                initials: initials,
+                abbreviation: abbreviation,
+                description: description,
+                path: journal_path,
+                languages: languages,
+                appear: appear,
+                publisher: publisher,
+                issn: issn,
+                e_issn: e_issn,
+                reg_number: reg_number,
+                
+            } });
             } catch (error) {
               res.status(500).json(error.message);
             }
@@ -130,7 +132,7 @@ export const createJournal = async (req, res) => {
             reg_number: reg_number,
             
         });
-        res.status(200).json({msg: "Jurnal created successfully",
+        res.status(200).json({msg: "Journal created successfully",
             data: {
                 title: title,
                 initials: initials,
@@ -147,7 +149,7 @@ export const createJournal = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({msg: "Jurnal failed to create"});
+        res.status(500).json({msg: "Journal failed to create"});
     }
 }
 
@@ -167,11 +169,12 @@ export const updateJournal = async (req, res) => {
                     path : req.params.path
                 }
             });
-            res.status(200).json({msg: "Jurnal updated",
+            res.status(200).json({msg: "Journal updated",
                 data: req.body
             });
         } catch (error) {
-            res.status(500).json({msg: "Jurnal failed to update"});
+            
+            res.status(500).json({msg: "Journal failed to update"});
         }
         return ;
     }
@@ -226,11 +229,11 @@ export const updateJournal = async (req, res) => {
                 path : req.params.path
             }
         });
-        res.status(200).json({msg: "Jurnal updated",
+        res.status(200).json({msg: "Journal updated",
             data: req.body
         });
     } catch (error) {
-        res.status(500).json({msg: "Jurnal failed to update"});
+        res.status(500).json({msg: "Journal failed to update"});
     }
 }
 
@@ -242,7 +245,7 @@ export const deleteJournal = async(req, res) => {
     });
     if(!journal) return res.status(404).json({msg : "No Journal Found"});
     try {
-        let image_path = getJournals.image_path
+        let image_path = journal.image_path
         if(image_path != ""){
             const image_path_split = image_path.split("/");
             let fileName = image_path_split[image_path_split.length - 1]

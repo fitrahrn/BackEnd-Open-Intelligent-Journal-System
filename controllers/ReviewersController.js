@@ -7,14 +7,6 @@ import Reviews from "../models/ReviewsModel.js";
 import Article from "../models/ArticleModel.js";
 import Journal from "../models/JournalModel.js";
 import ReviewersFile from "../models/ReviewersFileModel.js";
-export const getReviewers = async(req, res) => {
-    try {
-        const response = await Reviewers.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 export const getReviewersFromUser = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -23,9 +15,9 @@ export const getReviewersFromUser = async(req, res) => {
                 username : username
             }
         })
-        const response = await Reviewers.findAll({
+        let response = await Reviewers.findAll({
             where : {
-                user_id : userResponse.dataValues.user_id
+                user_id : userResponse.user_id
             },
             include:[{
                 model:Reviews,
@@ -36,17 +28,17 @@ export const getReviewersFromUser = async(req, res) => {
                 }],
             }],
         })
+        response =  JSON.parse(JSON.stringify(response))
+
         for(let i=0;i<response.length;i++){
             const journalResponse = await Journal.findOne({
                 where : {
-                    journal_id: response[i].dataValues.review.article.journal_id
+                    journal_id: response[i].review.article.journal_id
                 },
 
             });
-            console.log(journalResponse.dataValues.title)
-            response[i].dataValues.journal_title= journalResponse.dataValues.title
+            response[i].journal_title= journalResponse.title
         }
-        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -83,7 +75,7 @@ export const getReviewersFromUserReviewers = async(req, res) => {
         const response = await Reviewers.findOne({
             where : {
                 reviews_id: req.params.id,
-                user_id: userResponse.dataValues.user_id
+                user_id: userResponse.user_id
             }
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
@@ -127,9 +119,9 @@ export const addReviewers = async (req,res)=>{
 }
 export const writeReviews = async (req,res)=>{
     const { reviewers_id, editor_review,author_review,recommendation,date_completed} = req.body;
-    const file = req.files.file;
-    console.log(recommendation)
-    if(file !== null){
+    
+    if(req.files){
+        const file = req.files.file;
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = "Review-"+file.md5 + extension;

@@ -8,17 +8,9 @@ import querystring from "querystring"
 import Contributors from "../models/ContributorsModel.js";
 import User from "../models/UserModel.js";
 
-export const getArticles = async(req, res) => {
-    try {
-        const response = await Article.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 export const getArticleById = async(req, res) => {
     try {
-        const response = await Article.findOne({
+        let response = await Article.findOne({
             where : {
                 article_id : req.params.id
             },
@@ -28,10 +20,11 @@ export const getArticleById = async(req, res) => {
                 attributes: ['title']
             }],
         });
+        response =  JSON.parse(JSON.stringify(response))
         let articles = [];
         const authorResponse = await Contributors.findAll({
             where : {
-                article_id : response.dataValues.article_id
+                article_id : response.article_id
             },
             include:[{
                 model:User,
@@ -41,19 +34,19 @@ export const getArticleById = async(req, res) => {
         });
         //response.author = {}
         for(let j=0;j<authorResponse.length;j++){
-            articles.push(authorResponse[j].dataValues.user)
+            articles.push(authorResponse[j].user)
         }
-        response.dataValues.authors = articles
-        response.dataValues.journal_title = response.dataValues.journal.dataValues.title
+        response.authors = articles
+        response.journal_title = response.journal.title
         const issueResponse = await Issue.findOne({
             where : {
-                issue_id : response.dataValues.issue_id
+                issue_id : response.issue_id
             }
 
         });
-        response.dataValues.year = issueResponse.dataValues.year
-        response.dataValues.volume = issueResponse.dataValues.volume
-        response.dataValues.issue = issueResponse.dataValues.number
+        response.year = issueResponse.year
+        response.volume = issueResponse.volume
+        response.issue = issueResponse.number
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -67,9 +60,9 @@ export const getArticleByUser = async(req, res) => {
                 username : username
             }
         })
-        const response = await Contributors.findAll({
+        let response = await Contributors.findAll({
             where : {
-                user_id : userResponse.dataValues.user_id
+                user_id : userResponse.user_id
             },
             include:[{
                 model:Article,
@@ -78,14 +71,15 @@ export const getArticleByUser = async(req, res) => {
                 
             }],
         });
+        response =  JSON.parse(JSON.stringify(response))
         for(let i=0;i<response.length;i++){
             const journalResponse = await Journal.findOne({
                 where : {
-                    journal_id: response[i].dataValues.article.journal_id
+                    journal_id: response[i].article.journal_id
                 },
 
             });
-            response[i].dataValues.journal_title= journalResponse.dataValues.title
+            response[i].journal_title= journalResponse.title
         }
 
         res.status(200).json(response);
@@ -126,8 +120,8 @@ export const getArticlesByIssue = async(req, res) => {
         const response = await Article.findAll({
             where : {
                 [Op.and]:{
-                    issue_id : issueResponse.dataValues.issue_id,
-                    journal_id : journalResponse.dataValues.journal_id
+                    issue_id : issueResponse.issue_id,
+                    journal_id : journalResponse.journal_id
                 }
             }
         });
@@ -143,17 +137,19 @@ export const getArticlesByJournal = async(req, res) => {
                 path : req.params.journal
             }
         });
-        const response = await Article.findAll({
+        let response = await Article.findAll({
             where : {
-                journal_id : journalResponse.dataValues.journal_id
+                journal_id : journalResponse.journal_id
             }
 
         });
-        let articles = [];
+        response =  JSON.parse(JSON.stringify(response))
+        
         for(let i=0;i<response.length;i++){
+            let articles = [];
             const authorResponse = await Contributors.findAll({
                 where : {
-                    article_id : response[i].dataValues.article_id
+                    article_id : response[i].article_id
                 },
                 include:[{
                     model:User,
@@ -164,19 +160,19 @@ export const getArticlesByJournal = async(req, res) => {
             });
             //response.author = {}
             for(let j=0;j<authorResponse.length;j++){
-                if(j<authorResponse.length-1) articles.push(authorResponse[j].dataValues.user.dataValues.name + ', ')
-                else articles.push(authorResponse[j].dataValues.user.dataValues.name)
+                if(j<authorResponse.length-1) articles.push(authorResponse[j].user.name + ', ')
+                else articles.push(authorResponse[j].user.name)
             }
-            response[i].dataValues.authors = articles
+            response[i].authors = articles
             const issueResponse = await Issue.findOne({
                 where : {
-                    issue_id : response[i].dataValues.issue_id
+                    issue_id : response[i].issue_id
                 }
     
             });
-            response[i].dataValues.year = issueResponse.dataValues.year
-            response[i].dataValues.volume = issueResponse.dataValues.volume
-            response[i].dataValues.issue = issueResponse.dataValues.number
+            response[i].year = issueResponse.year
+            response[i].volume = issueResponse.volume
+            response[i].issue = issueResponse.number
         }
         res.status(200).json(response);
     } catch (error) {
@@ -210,7 +206,7 @@ export const createArticle = async (req, res) => {
     const findIssue = await Issue.findOne({
         where: {
             [Op.and]:{
-                journal_id: findJournal.dataValues.journal_id,
+                journal_id: findJournal.journal_id,
                 date_published : {
                     [Op.lt]:'2001-01-02'
                 },
@@ -218,7 +214,9 @@ export const createArticle = async (req, res) => {
             }
         }
     });
-    const findLastArticle = await Article.findAll();
+    
+    const getAllArticle = await Article.findAll()
+    const findLastArticle = getAllArticle !=null ?getAllArticle.pop().article_id : 0;
     if (!findIssue) return res.status(409).json({msg: "No unpublished issue found"});
     const file = req.files.file;
     const fileSize = file.data.length;
@@ -233,9 +231,9 @@ export const createArticle = async (req, res) => {
         if (error) return res.status(500).json({ msg: error.message });
         try {
             const article = await Article.create({
-                article_id: findLastArticle.pop().dataValues.article_id+1,
-                journal_id : findJournal.dataValues.journal_id,
-                issue_id : findIssue.dataValues.issue_id,
+                article_id: findLastArticle+1,
+                journal_id : findJournal.journal_id,
+                issue_id : findIssue.issue_id,
                 prefix: prefix,
                 title: title,
                 subtitle : subtitle,
@@ -247,25 +245,24 @@ export const createArticle = async (req, res) => {
                 status: "not reviewed"
             });
             await Contributors.create({
-                article_id: article.dataValues.article_id,
-                user_id: findUser.dataValues.user_id,
+                article_id: article.article_id,
+                user_id: findUser.user_id,
             })
             if(contributors !== "0"){
                 await Contributors.create({
-                    article_id: article.dataValues.article_id,
+                    article_id: article.article_id,
                     user_id: contributors,
                 })
             }
             res.status(200).json({msg: "Article created successfully",
                 data: {
-                    article_id: findLastArticle.pop().dataValues.article_id+1,
-                    journal_id : findJournal.dataValues.journal_id,
-                    issue_id : findIssue.dataValues.issue_id,
+                    article_id: findLastArticle+1,
+                    journal_id : findJournal.journal_id,
+                    issue_id : findIssue.issue_id,
                     prefix: prefix,
                     title: title,
                     subtitle : subtitle,
                     abstract : abstract,
-                    article_path : file_path,
                     comment : "",
                     keywords : keywords,
                     workflow_phase: "submitted",
@@ -337,7 +334,6 @@ export const updateArticle = async (req, res) => {
                 title: req.body.title,
                 subtitle : req.body.subtitle,
                 abstract : req.body.abstract,
-                article_path : article_path,
                 comment :req.body.comment,
                 keywords : req.body.keywords,
                 workflow_phase: req.body.workflow_phase,
@@ -345,7 +341,7 @@ export const updateArticle = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({msg: "Article failed to update"});
+        res.status(500).json({msg: "Article failed to update",error:error.message});
     }
 }
 

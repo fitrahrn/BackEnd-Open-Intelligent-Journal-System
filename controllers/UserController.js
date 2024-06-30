@@ -3,18 +3,7 @@
 import User from "../models/UserModel.js";
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
-export const getUserId = async(req, res) => {
-    try {
-        const response = await User.findOne({
-            where : {
-                email: req.params.id
-            }
-        });
-        res.status(200).json(response["user_id"]); 
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
+
 export const getUserByUsername = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -26,18 +15,6 @@ export const getUserByUsername = async(req, res) => {
         res.status(200).json(response); 
     } catch (error) {
         console.log(error.message)
-        res.status(500).json(error.message);
-    }
-}
-export const getUserByEmail = async(req, res) => {
-    try {
-        const response = await User.findOne({
-            where : {
-                email: req.params.email
-            }
-        });
-        res.status(200).json(response); 
-    } catch (error) {
         res.status(500).json(error.message);
     }
 }
@@ -56,12 +33,12 @@ export const getUserWithoutItself = async(req, res) => {
     }
 }
 export const findUserByName = async(req, res) => {
-    const { title} = req.body;
+    const { name} = req.body;
     try {
         const response = await User.findAll({
             where : {
                 name : {
-                    [Op.like] : `%${title}%`
+                    [Op.like] : `%${name}%`
                 }
             }
         });
