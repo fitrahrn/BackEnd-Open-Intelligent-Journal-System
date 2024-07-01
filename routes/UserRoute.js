@@ -11,7 +11,7 @@ const router = express.Router();
 // buat endpoint
 router.get('/user/get/username',getUserByUsername);
 router.get('/get/contributors',getUserWithoutItself);
-router.post('/user/name',findUserByName);
+router.post('/user/search',findUserByName);
 router.patch('/user/update',updateProfile);
 
 export default router;

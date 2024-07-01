@@ -28,7 +28,6 @@ export const getArticleFileFromPhase = async(req, res) => {
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
     } catch (error) {
-        console.log(error)
         res.status(500).json(error.message);
     }
 }

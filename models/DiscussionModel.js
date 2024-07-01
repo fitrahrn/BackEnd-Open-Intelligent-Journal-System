@@ -7,7 +7,8 @@ const {DataTypes} = Sequelize;
 const Discussion = db.define('discussion',{
     discussion_id : {
         type : DataTypes.INTEGER,
-        primaryKey : true
+        primaryKey : true,
+        autoIncrement: true
     },
     reviews_id : {
         type : DataTypes.INTEGER,

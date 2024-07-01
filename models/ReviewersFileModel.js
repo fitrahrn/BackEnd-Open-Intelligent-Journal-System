@@ -7,7 +7,8 @@ const {DataTypes} = Sequelize;
 const ReviewersFile = db.define('reviewers_file',{
     reviewers_file_id : {
         type : DataTypes.INTEGER,
-        primaryKey : true
+        primaryKey : true,
+        autoIncrement: true
     },
     reviewers_id : {
         type : DataTypes.INTEGER,

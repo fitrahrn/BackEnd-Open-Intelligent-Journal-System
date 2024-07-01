@@ -390,6 +390,26 @@ describe('Article Controller', () => {
             expect(response.status).toBe(200);
             expect(response.body).toEqual([single_article]);
         });
+        it('should return journal not found', async () => {
+            Journal.findOne.mockResolvedValue(null);
+            Issue.findOne.mockResolvedValue(single_issue);
+            Article.findAll.mockResolvedValue([single_article]);
+
+            const response = await request(app).get('/articles/jmfs/1/1');
+
+            expect(response.status).toBe(409);
+            expect(response.body.msg).toBe('Journal not found');
+        });
+        it('should return issue not found', async () => {
+            Journal.findOne.mockResolvedValue(single_journal);
+            Issue.findOne.mockResolvedValue(null);
+            Article.findAll.mockResolvedValue([single_article]);
+
+            const response = await request(app).get('/articles/jictra/1/5');
+
+            expect(response.status).toBe(409);
+            expect(response.body.msg).toBe('Issue not found');
+        });
 
         it('should return 500 if there is an error', async () => {
             Journal.findOne.mockRejectedValue(new Error('Something went wrong'));
@@ -414,7 +434,16 @@ describe('Article Controller', () => {
             expect(response.status).toBe(200);
             expect(response.body).toEqual(response_array_article);
         });
+        it('should return journal not found', async () => {
+            Journal.findOne.mockResolvedValue(null);
+            Issue.findOne.mockResolvedValue(single_issue);
+            Article.findAll.mockResolvedValue([single_article]);
 
+            const response = await request(app).get('/articles/jmfs/1/1');
+
+            expect(response.status).toBe(409);
+            expect(response.body.msg).toBe('Journal not found');
+        });
         it('should return 500 if there is an error', async () => {
             Journal.findOne.mockRejectedValue(new Error('Something went wrong'));
 
@@ -548,7 +577,7 @@ describe('Article Controller', () => {
                 msg:"Article updated"
             });
         });
-        it('should return 500 if article not found', async () => {
+        it('should return 404 if article not found', async () => {
             Article.findOne.mockResolvedValue(null);
 
             const response = await request(app)

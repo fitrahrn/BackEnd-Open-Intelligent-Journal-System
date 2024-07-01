@@ -272,7 +272,7 @@ describe("Journal Controller", () => {
             .field('e_issn', "2338-5499")
             .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
             .attach('file',path.resolve('./public/images/jictra.png'));
-            expect(res.statusCode).toEqual(201);
+            expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual({
                 msg: "Journal Created Successfully",
                 data:response_journal_without_image
@@ -306,6 +306,27 @@ describe("Journal Controller", () => {
             expect(res.statusCode).toEqual(409);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "Journal already exist"
+            }));
+        });
+        it("should handle existing database errors", async () => {
+            Journal.findOne.mockResolvedValue(null);
+            Journal.create.mockRejectedValue(new Error('Something went wrong'));
+            const res = await request(app).post("/journal")
+            .field('title', "Journal of ICT Research and Applications")
+            .field('initials', "jictra",)
+            .field('abbreviation', "jictra")
+            .field('description', "Journal of ICT Research and Applications welcomes full research articles in the area of Information and Communication Technology from the following subject areas: Information Theory, Signal Processing, Electronics, Computer Network, Telecommunication, Wireless & Mobile Computing, Internet Technology, Multimedia, Software Engineering, Computer Science, Information System and Knowledge Management. Abstracts and articles published on Journal of ICT Research and Applications are available online at ITB Journal and indexed by Scopus, Google Scholar, Directory of Open Access Journals, Electronic Library University of Regensburg, EBSCO Open Science Directory, International Association for Media and Communication Research (IAMCR), MIAR: Information Matrix for the Analysis of Journals Universitat de Barcelona, Cabells Directories, Zurich Open Repository and Archive Journal Database, Open Academic Journals Index, Indonesian Publication Index and ISJD-Indonesian Institute of Sciences. The journal is under reviewed by Compendex, Engineering Village.",)
+            .field('journal_path', "jictra")
+            .field('languages', "Indonesia")
+            .field('appear', 0)
+            .field('publisher', "Institute for Research and Community Services, Ins")
+            .field('issn', "2337-5787")
+            .field('e_issn', "2338-5499")
+            .field('reg_number', "Reg. No. 691-SIC-UPPGT-SIT-1963, Accreditation No.")
+            .attach('file',path.resolve('./public/images/jictra.png'));
+            expect(res.statusCode).toEqual(500);
+            expect(res.body).toEqual(expect.objectContaining({
+                msg: "Journal failed to create"
             }));
         });
     });

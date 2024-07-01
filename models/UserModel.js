@@ -11,7 +11,8 @@ const {DataTypes} = Sequelize;
 const User = db.define('user', {
     user_id : {
         type : DataTypes.INTEGER,
-        primaryKey : true
+        primaryKey : true,
+        autoIncrement: true
     },
     name: DataTypes.STRING,
     public_name: DataTypes.STRING,

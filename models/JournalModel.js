@@ -6,7 +6,8 @@ const {DataTypes} = Sequelize;
 const Journal = db.define('journal',{
     journal_id : {
         type : DataTypes.INTEGER,
-        primaryKey : true
+        primaryKey : true,
+        autoIncrement: true
     },
     title : DataTypes.STRING,
     initials: DataTypes.STRING,

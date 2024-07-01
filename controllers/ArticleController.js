@@ -109,6 +109,7 @@ export const getArticlesByIssue = async(req, res) => {
                 path : req.params.journal
             }
         });
+        if(!journalResponse) return res.status(409).json({msg: "Journal not found"});
         const issueResponse = await Issue.findOne({
             where : {
                 [Op.and]:{
@@ -117,6 +118,7 @@ export const getArticlesByIssue = async(req, res) => {
                 }
             }
         });
+        if(!issueResponse) return res.status(409).json({msg: "Issue not found"});
         const response = await Article.findAll({
             where : {
                 [Op.and]:{
@@ -137,6 +139,7 @@ export const getArticlesByJournal = async(req, res) => {
                 path : req.params.journal
             }
         });
+        if(!journalResponse) return res.status(409).json({msg: "Journal not found"});
         let response = await Article.findAll({
             where : {
                 journal_id : journalResponse.journal_id

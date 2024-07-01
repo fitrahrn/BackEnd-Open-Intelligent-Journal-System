@@ -3,14 +3,6 @@ import Role from "../models/RoleModel.js";
 import User from "../models/UserModel.js";
 import Journal from "../models/JournalModel.js";
 import { Op } from "sequelize";
-export const getRoles = async(req, res) => {
-    try {
-        const response = await Role.findAll(); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 export const getRolesRequest = async(req, res) => {
     try {
         const response = await Role.findAll({
@@ -26,11 +18,11 @@ export const getRolesRequest = async(req, res) => {
         for(let i=0;i<response.length;i++){
             const journalResponse = await Journal.findOne({
                 where : {
-                    journal_id: response[i].dataValues.journal_id
+                    journal_id: response[i].journal_id
                 },
 
             });
-            response[i].dataValues.journal_title= journalResponse.dataValues.title
+            response[i].journal_title= journalResponse.title
         }
         res.status(200).json(response);
     } catch (error) {
@@ -38,35 +30,19 @@ export const getRolesRequest = async(req, res) => {
     }
 }
 
-export const getRoleFromJournal = async(req, res) => {
-    const findJournal = await Journal.findOne({
-        where: {
-            path: req.params.path
-        }
-    });
-    try {
-        const response = await Role.findAll({
-            where : {
-                journal_id: findJournal.dataValues.journal_id
-            }
-        }); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
 export const getReviewersFromJournal = async(req, res) => {
-    const findJournal = await Journal.findOne({
-        where: {
-            path : req.params.path,
-        },
-
-    });
+    
     try {
+        const findJournal = await Journal.findOne({
+            where: {
+                path : req.params.path,
+            },
+    
+        });
         const response = await Role.findAll({
             where : {
                 [Op.and]:{
-                    journal_id: findJournal.dataValues.journal_id,
+                    journal_id: findJournal.journal_id,
                     reviewer : true
                 }
             },
@@ -81,48 +57,6 @@ export const getReviewersFromJournal = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
-export const getAuthorFromJournal = async(req, res) => {
-    const findJournal = await Journal.findOne({
-        where: {
-            path : req.params.path,
-        }
-    });
-    try {
-        const response = await Role.findAll({
-            where : {
-                [Op.and]:{
-                    journal_id: findJournal.dataValues.journal_id,
-                    author : true
-                }
-                
-            }
-        }); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
-export const getEditorFromJournal = async(req, res) => {
-    const findJournal = await Journal.findOne({
-        where: {
-            path : req.params.path,
-        }
-    });
-    try {
-        const response = await Role.findAll({
-            where : {
-                [Op.and]:{
-                    journal_id: findJournal.dataValues.journal_id,
-                    editor : true
-                }
-            }
-        }); // seluruh atribut same as SELECT * FROM
-        res.status(200).json(response);
-    } catch (error) {
-        res.status(500).json(error.message);
-    }
-}
-
 export const getRoleFromUser = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -134,7 +68,7 @@ export const getRoleFromUser = async(req, res) => {
         if (!findUser) return res.status(409).json({msg: "User not found"});
         const response = await Role.findAll({
             where : {
-                user_id: findUser.dataValues.user_id
+                user_id: findUser.user_id
             },
             include:[{
                 model:Journal,
@@ -151,7 +85,7 @@ export const getRoleFromUser = async(req, res) => {
 export const addRole = async (req,res)=>{
     const { journal_id} = req.body;
     const username = req.cookies.username;
-    if (!(username && path)) return res.status(400).json({msg: "All input is required"});
+    if (!(username && journal_id)) return res.status(400).json({msg: "All input is required"});
     try{
         const findUser = await User.findOne({
             where: {
@@ -162,7 +96,7 @@ export const addRole = async (req,res)=>{
         
 
         await Role.create({
-            user_id: findUser.dataValues.user_id,
+            user_id: findUser.user_id,
             journal_id: journal_id,
             administrator: false,
             lead_editor:false,
@@ -172,7 +106,7 @@ export const addRole = async (req,res)=>{
         });
         res.status(200).json({msg: "New Role added successfully",
             data: {
-                user_id: findUser.dataValues.user_id,
+                user_id: findUser.user_id,
                 journal_id: journal_id,
                 administrator: false,
                 lead_editor:false,
@@ -202,8 +136,8 @@ export const updateRole = async (req,res)=>{
         });
         if (!findJournal) return res.status(409).json({msg: "Journal not found"});
         await Role.update({
-            user_id: findUser.dataValues.user_id,
-            journal_id: findJournal.dataValues.journal_id,
+            user_id: findUser.user_id,
+            journal_id: findJournal.journal_id,
             administrator:req.body.administrator,
             lead_editor:req.body.lead_editor,
             editor:req.body.editor,
@@ -217,8 +151,8 @@ export const updateRole = async (req,res)=>{
         });
         res.status(200).json({msg: "Role updated",
             data: {
-                user_id: findUser.dataValues.user_id,
-                journal_id: findJournal.dataValues.journal_id,
+                user_id: findUser.user_id,
+                journal_id: findJournal.journal_id,
                 administrator:req.body.administrator,
                 lead_editor:req.body.lead_editor,
                 editor:req.body.editor,
@@ -244,34 +178,33 @@ export const requestRoles = async (req,res)=>{
         const findRole = await Role.findOne({
             where: {
                 [Op.and]:{
-                    user_id : findUser.dataValues.user_id,
+                    user_id : findUser.user_id,
                     journal_id : journal_id
                 }
             }
         });
         if (!findRole) return res.status(409).json({msg: "Role not found"});
-        if (findRole.dataValues.request) return res.status(409).json({msg: "User already have role request"});
-        if (request==="administrator" && findRole.dataValues.administrator=== true) return res.status(409).json({msg: "User already have the role"});
-        if (request==="lead_editor" && findRole.dataValues.lead_editor=== true) return res.status(409).json({msg: "User already have the role"});
-        if (request==="editor" && findRole.dataValues.editor=== true) return res.status(409).json({msg: "User already have the role"});
-        if (request==="reviewer" && findRole.dataValues.reviewer=== true) return res.status(409).json({msg: "User already have the role"});
-        if (request==="author" && findRole.dataValues.author=== true) return res.status(409).json({msg: "User already have the role"});
+        if (findRole.request) return res.status(409).json({msg: "User already have role request"});
+        if (request==="administrator" && findRole.administrator=== true) return res.status(409).json({msg: "User already have the role"});
+        if (request==="lead_editor" && findRole.lead_editor=== true) return res.status(409).json({msg: "User already have the role"});
+        if (request==="editor" && findRole.editor=== true) return res.status(409).json({msg: "User already have the role"});
+        if (request==="reviewer" && findRole.reviewer=== true) return res.status(409).json({msg: "User already have the role"});
+        if (request==="author" && findRole.author=== true) return res.status(409).json({msg: "User already have the role"});
         await Role.update({
             request: request
         }, {
             where : {
-                role_id : findRole.dataValues.role_id
+                role_id : findRole.role_id
             }
         });
         res.status(200).json({msg: "Role updated",
             data: {
-                user_id: findUser.dataValues.user_id,
+                user_id: findUser.user_id,
                 journal_id: journal_id,
                 request: request
             }
         });
     } catch (error) {
-        console.log(error.message)
         res.status(500).json({msg: "Role request failed to update"});
     }
 }
@@ -284,7 +217,7 @@ export const answerRequestRoles = async (req,res)=>{
             }
         });
         if (!findRole) return res.status(409).json({msg: "Role not found"});
-        if (!findRole.dataValues.request) return res.status(409).json({msg: "User don't have role request"});
+        if (!findRole.request) return res.status(409).json({msg: "User don't have role request"});
         if (accept ===false){
             await Role.update({
                 request:null
@@ -299,7 +232,7 @@ export const answerRequestRoles = async (req,res)=>{
                 }
             });
         }
-        else if(accept ===true && findRole.dataValues.request==="lead_editor"){
+        else if(accept ===true && findRole.request==="lead_editor"){
             await Role.update({
                 lead_editor:true,
                 request:null
@@ -316,7 +249,7 @@ export const answerRequestRoles = async (req,res)=>{
                 }
             });
         }
-        else if(accept ===true && findRole.dataValues.request==="editor"){
+        else if(accept ===true && findRole.request==="editor"){
             await Role.update({
                 editor:true,
                 request:null
@@ -332,7 +265,7 @@ export const answerRequestRoles = async (req,res)=>{
                 }
             });
         }
-        else if(accept ===true && findRole.dataValues.request==="reviewer"){
+        else if(accept ===true && findRole.request==="reviewer"){
             await Role.update({
                 reviewer:true,
                 request:null
@@ -348,7 +281,7 @@ export const answerRequestRoles = async (req,res)=>{
                 }
             });
         }
-        else if(accept ===true && findRole.dataValues.request==="author"){
+        else if(accept ===true && findRole.request==="author"){
             await Role.update({
                 author:true,
                 request:null
@@ -365,21 +298,20 @@ export const answerRequestRoles = async (req,res)=>{
             });
         }
         else {
-            if (!findRole.dataValues.request) return res.status(409).json({msg: "User don't have role request"});
+            if (!findRole.request) return res.status(409).json({msg: "User don't have role request"});
         }
         
     } catch (error) {
-        console.log(error.message)
         res.status(500).json({msg: "Role request failed to update"});
     }
 }
 export const deleteRole= async(req, res) => {
-    const eviewers = await Role.findOne({
+    const reviewers = await Role.findOne({
         where : {
             Role_id: req.params.id
         }
     });
-    if(!eviewers) return res.status(404).json({msg : "No Role Found"});
+    if(!reviewers) return res.status(404).json({msg : "No Role Found"});
     try {
         await Role.destroy({
             where : {

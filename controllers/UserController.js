@@ -12,6 +12,7 @@ export const getUserByUsername = async(req, res) => {
                 username: username
             }
         });
+        console.log(response)
         res.status(200).json(response); 
     } catch (error) {
         console.log(error.message)
@@ -42,7 +43,7 @@ export const findUserByName = async(req, res) => {
                 }
             }
         });
-        res.status(200).json(response["user_id"]); 
+        res.status(200).json(response); 
     } catch (error) {
         res.status(500).json(error.message);
     }
@@ -56,16 +57,16 @@ export const updateProfile = async (req, res) => {
             username : username
         }
     });
-    if(!user) return res.status(404).json({msg : "No user Found"});
-    let hashPassword = user.dataValues.password; 
+    if(!user) return res.status(400).json({msg : "No user found"});
+    let hashPassword = user.password; 
     const match = await bcrypt.compare(req.body.current_password, user.password);
     if(password!="" && password ===confPassword){
-        if(!match) res.status(500).json({msg: "Current Password are incorrect"});
+        if(!match) return res.status(409).json({msg: "Current Password are incorrect"});
         const salt = await bcrypt.genSalt();
         hashPassword = await bcrypt.hash(password, salt);
     }
-    let image_path = User.profile_picture
-    const image_path_split = image_path.split("/");
+    let image_path = user.profile_picture
+    let fileName = ""
     if(image_path === null&& req.body.image_path === "") {
         try {
             await User.update(req.body, {
@@ -82,11 +83,13 @@ export const updateProfile = async (req, res) => {
         return ;
     }
 
-    let fileName = ""
+    
 
-    if(req.files === null) {
+    else if(req.files === null) {
+        const image_path_split = image_path.split("/");
         fileName = image_path_split[image_path_split.length - 1]
     } else {
+        const image_path_split = image_path.split("/");
         // user mengupload song baru
         // buat nama file (md5) baru juga
         const file = req.files.file;
@@ -116,7 +119,7 @@ export const updateProfile = async (req, res) => {
         await User.update({
             name: req.body.name,
             public_name: req.body.public_name,
-            username: user.dataValues.username,
+            username: user.username,
             email: req.body.email,
             password: hashPassword,
             phone: req.body.phone,

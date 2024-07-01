@@ -31,10 +31,8 @@ export const getDiscussionFromReviewsId = async(req, res) => {
             response[i].dataValues.time_last_send = messageLastSendTime
             response[i].dataValues.name_last_send = messageLastSendName
         }
-        console.log(response)
         res.status(200).json(response);
     } catch (error) {
-        console.log(error.message)
         res.status(500).json(error.message);
     }
 }

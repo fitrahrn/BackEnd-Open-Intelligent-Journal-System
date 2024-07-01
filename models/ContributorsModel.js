@@ -7,7 +7,8 @@ const {DataTypes} = Sequelize;
 const Contributors = db.define('contributors',{
     contributors_id : {
         type : DataTypes.INTEGER,
-        primaryKey : true
+        primaryKey : true,
+        autoIncrement: true
     },
     article_id : {
         type : DataTypes.INTEGER,

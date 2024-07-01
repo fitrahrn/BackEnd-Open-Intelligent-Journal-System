@@ -80,7 +80,6 @@ export const getReviewersFromUserReviewers = async(req, res) => {
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
     } catch (error) {
-        console.log(error.message)
         res.status(500).json(error.message);
     }
 }
@@ -156,7 +155,6 @@ export const writeReviews = async (req,res)=>{
                     data: req.body
                 });
             } catch (error) {
-                console.log(error.message)
                 res.status(500).json({msg: "Reviewers failed to update"});
             }
         });
@@ -183,7 +181,6 @@ export const writeReviews = async (req,res)=>{
                 data: req.body
             });
         } catch (error) {
-            console.log(error.message)
             res.status(500).json({msg: "Reviewers failed to update"});
         }
     }

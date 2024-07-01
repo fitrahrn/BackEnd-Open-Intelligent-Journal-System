@@ -249,4 +249,66 @@ describe('Auth Testing', () => {
         expect(res.body).toHaveProperty('msg', 'Registration failed');
         });
     });
+    describe('GET /users', () => {
+    
+        it('should return all users ', async () => {
+            jest.spyOn(User, "findAll").mockResolvedValue([{
+                user_id: 1,
+                name: 'John Doe',
+                public_name: 'John Doe',
+                username: 'johndoe',
+                email: 'test@example.com',
+                password: '$2b$10$somethinghashed',
+                phone: "08123445678",
+                orcid_id: "2189-9178",
+                affiliation: "Universitas Gadjah Mada",
+                mailing_address: "test@example.com",
+                signature: "johndoe",
+                country:"United States of America",
+                profile_picture: "./profile_picture.jpg"
+            }])
+            User.findAll.mockResolvedValue([{
+            name: 'John Doe',
+            public_name: 'John Doe',
+            username: 'johndoe',
+            email: 'test@example.com',
+            password: 'password123',
+            confPassword: 'password123',
+            phone: "08123445678",
+            orcid_id: "2189-9178",
+            affiliation: "Universitas Gadjah Mada",
+            mailing_address: "test@example.com",
+            signature: "johndoe",
+            country: "United States of America",
+            journal_id: 1
+        }]);
+
+            const response = await request(app).get('/users');
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual([{
+                name: 'John Doe',
+                public_name: 'John Doe',
+                username: 'johndoe',
+                email: 'test@example.com',
+                password: 'password123',
+                confPassword: 'password123',
+                phone: "08123445678",
+                orcid_id: "2189-9178",
+                affiliation: "Universitas Gadjah Mada",
+                mailing_address: "test@example.com",
+                signature: "johndoe",
+                country: "United States of America",
+                journal_id: 1
+            }]);
+        });
+        it('should return 500 if there is an error', async () => {
+            User.findAll.mockRejectedValue(new Error('Something went wrong'));
+
+            const response = await request(app).get('/users');
+
+            expect(response.status).toBe(500);
+            expect(response.body).toBe('Something went wrong');
+        });
+    })
 })

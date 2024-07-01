@@ -47,7 +47,6 @@ export const getJournalsByUser = async(req, res) => {
         });
         res.status(200).json(response);
     } catch (error) {
-        console.log(error.message)
         res.status(500).json(error.message);
     }
 }
@@ -96,7 +95,7 @@ export const createJournal = async (req, res) => {
                 reg_number: reg_number,
                 
             });
-              res.status(201).json({ msg: "Journal Created Successfully",data:{
+              res.status(200).json({ msg: "Journal Created Successfully",data:{
                 title: title,
                 initials: initials,
                 abbreviation: abbreviation,
@@ -111,7 +110,7 @@ export const createJournal = async (req, res) => {
                 
             } });
             } catch (error) {
-              res.status(500).json(error.message);
+              res.status(500).json({msg: "Journal failed to create"});
             }
         });
         return ;
@@ -161,7 +160,7 @@ export const updateJournal = async (req, res) => {
     });
     if(!journal) return res.status(404).json({msg : "No Journal Found"});
     let image_path = journal.image_path
-    const image_path_split = image_path.split("/");
+    
     if(image_path === ""&& req.body.image_path === "") {
         try {
             await Journal.update(req.body, {
@@ -182,8 +181,10 @@ export const updateJournal = async (req, res) => {
     let fileName = ""
 
     if(req.files === null) {
+        const image_path_split = image_path.split("/");
         fileName = image_path_split[image_path_split.length - 1]
     } else {
+        const image_path_split = image_path.split("/");
         // user mengupload song baru
         // buat nama file (md5) baru juga
         const file = req.files.file;

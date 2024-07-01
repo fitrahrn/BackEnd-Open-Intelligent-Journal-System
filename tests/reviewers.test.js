@@ -106,9 +106,9 @@ const array_reviewers=[{
     editor_review:null,
     author_review:null,
     recommendation:null,
-    date_assigned:Date("2024-06-17"),
+    date_assigned:Date(2024,6,17),
     date_completed:null,
-    date_due:Date("2024-06-30"),
+    date_due:Date(2024,6,30),
     review:array_reviews[0],
 },
 {   
@@ -118,9 +118,9 @@ const array_reviewers=[{
     editor_review:"Check for spelling error",
     author_review:"Need revisions but its already good",
     recommendation:"revisions required",
-    date_assigned:Date("2024-06-17"),
-    date_completed:Date("2024-06-19"),
-    date_due:Date("2024-06-30"),
+    date_assigned:Date(2024,6,17),
+    date_completed:Date(2024,6,19),
+    date_due:Date(2024,6,30),
     user:array_user[0]
 },
 {
@@ -129,9 +129,9 @@ const array_reviewers=[{
     editor_review:null,
     author_review:null,
     recommendation:null,
-    date_assigned:Date("2024-06-17"),
+    date_assigned:Date(2024,6,17),
     date_completed:null,
-    date_due:Date("2024-06-30"),
+    date_due:Date(2024,6,30),
 },
 {
     reviewers_id:1,
@@ -140,9 +140,9 @@ const array_reviewers=[{
     editor_review:null,
     author_review:null,
     recommendation:null,
-    date_assigned:Date("2024-06-17"),
+    date_assigned:Date(2024,6,17),
     date_completed:null,
-    date_due:Date("2024-06-30"),
+    date_due:Date(2024,6,30),
 },
 ]
 const update_reviewers={   
@@ -150,7 +150,7 @@ const update_reviewers={
     editor_review:"Check for spelling error",
     author_review:"Need revisions but its already good",
     recommendation:"revisions required",
-    date_completed: Date("2024-06-19"),
+    date_completed: Date(2024,6,19),
 }
 const single_journal={
     journal_id: 1,
@@ -175,9 +175,9 @@ const response_reviewers=[{
     editor_review:null,
     author_review:null,
     recommendation:null,
-    date_assigned:Date("2024-06-17"),
+    date_assigned:Date(2024,6,17),
     date_completed:null,
-    date_due:Date("2024-06-30"),
+    date_due:Date(2024,6,30),
     review:array_reviews[0],
     journal_title:single_journal.title
 }]
@@ -275,8 +275,8 @@ describe('Reviewers Controller', () => {
                 .send({
                     reviews_id: 1,
                     user_id: 1,
-                    date_assigned: Date("2024-06-17"),
-                    date_due: Date("2024-06-24"),
+                    date_assigned: Date(2024,6,17),
+                    date_due: Date(2024,6,24),
                 });
 
             expect(response.status).toBe(200);
@@ -293,8 +293,8 @@ describe('Reviewers Controller', () => {
                 .send({
                     reviews_id: 1,
                     user_id: 1,
-                    date_assigned: Date("2024-06-17"),
-                    date_due: Date("2024-06-24"),
+                    date_assigned: Date(2024,6,17),
+                    date_due: Date(2024,6,24),
                 });
 
             expect(response.status).toBe(500);
@@ -313,7 +313,7 @@ describe('Reviewers Controller', () => {
                 .field('editor_review', "Check for spelling error")
                 .field('author_review', "Need revisions but its already good")
                 .field('recommendation', "revisions required")
-                .field('date_completed', Date("2024-06-19"))
+                .field('date_completed', Date(2024,6,19))
                 .attach('file',path.resolve('./public/articles/Article-34b5ffed24252709897ed965e2ee9516.pdf'));
 
             expect(response.status).toBe(200);
@@ -330,7 +330,7 @@ describe('Reviewers Controller', () => {
                 .field('editor_review', "Check for spelling error")
                 .field('author_review', "Need revisions but its already good")
                 .field('recommendation', "revisions required")
-                .field('date_completed', Date("2024-06-19"))
+                .field('date_completed', Date(2024,6,19))
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
@@ -349,7 +349,7 @@ describe('Reviewers Controller', () => {
             .field('editor_review', "Check for spelling error")
             .field('author_review', "Need revisions but its already good")
             .field('recommendation', "revisions required")
-            .field('date_completed', Date("2024-06-19"))
+            .field('date_completed', Date(2024,6,19))
 
             expect(response.status).toBe(404);
             expect(response.body.msg).toBe("No Reviewers Found");
@@ -364,7 +364,7 @@ describe('Reviewers Controller', () => {
             .field('editor_review', "Check for spelling error")
             .field('author_review', "Need revisions but its already good")
             .field('recommendation', "revisions required")
-            .field('date_completed', Date("2024-06-19"))
+            .field('date_completed', Date(2024,6,19))
             .attach('file',path.resolve('./public/articles/Article-34b5ffed24252709897ed965e2ee9516.pdf'));
 
             expect(response.status).toBe(500);

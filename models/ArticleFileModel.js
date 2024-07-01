@@ -6,7 +6,8 @@ const {DataTypes} = Sequelize;
 const ArticleFile = db.define('article_file',{
     article_file_id : {
         type : DataTypes.INTEGER,
-        primaryKey : true
+        primaryKey : true,
+        autoIncrement: true
     },
     article_id : {
         type : DataTypes.INTEGER,
