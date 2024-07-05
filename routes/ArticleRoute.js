@@ -5,6 +5,7 @@ import {
     getArticlesByJournal,
     getArticlesByTitle,
     getArticleByUser,
+    getArticleByUserName,
     createArticle,
     updateArticle,
     deleteArticle,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.get("/article/:id", getArticleById);
 router.get("/articles/submission",getArticleByUser);
+router.get("/articles/citation/:username",getArticleByUserName);
 router.get("/articles/:journal/:volume/:number",getArticlesByIssue);
 router.get("/articles/:journal",getArticlesByJournal);
 router.post("/article/search",getArticlesByTitle);

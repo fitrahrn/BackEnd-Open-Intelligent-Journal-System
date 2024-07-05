@@ -5,7 +5,7 @@ import Journal from "../models/JournalModel.js";
 import { Op } from "sequelize";
 export const getRolesRequest = async(req, res) => {
     try {
-        const response = await Role.findAll({
+        let response = await Role.findAll({
             where : {
                 request :{ [Op.ne]: null } 
             },
@@ -15,6 +15,7 @@ export const getRolesRequest = async(req, res) => {
             }],
             
         }); // seluruh atribut same as SELECT * FROM
+        response =  JSON.parse(JSON.stringify(response))
         for(let i=0;i<response.length;i++){
             const journalResponse = await Journal.findOne({
                 where : {
@@ -24,6 +25,7 @@ export const getRolesRequest = async(req, res) => {
             });
             response[i].journal_title= journalResponse.title
         }
+        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);

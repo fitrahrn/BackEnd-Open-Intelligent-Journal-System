@@ -52,6 +52,46 @@ export const getArticleById = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
+export const getArticleByUserName = async(req, res) => {
+    try {
+        const userResponse = await User.findOne({
+            where : {
+                username : req.params.username
+            }
+        })
+        let response = await Contributors.findAll({
+            where : {
+                user_id : userResponse.user_id
+            },
+            include:[{
+                model:Article,
+                required: true,
+                attributes:['cite'],
+                where : {
+                    workflow_phase:"published"
+                },
+                
+            }],
+        });
+        response =  JSON.parse(JSON.stringify(response))
+        let dataResponse=[{
+            citationCount:0,
+            document:0,
+            id:0,
+        }]
+        for(let i=0;i<response.length;i++){
+            dataResponse.push({
+                citationCount:response[i].article.cite,
+                document:i+1,
+                id:i+1,
+            })
+        }
+
+        res.status(200).json(dataResponse);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
 export const getArticleByUser = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -245,7 +285,9 @@ export const createArticle = async (req, res) => {
                 comment : "",
                 keywords : keywords,
                 workflow_phase: "submitted",
-                status: "not reviewed"
+                status: "not reviewed",
+                date_published:new Date(),
+                cite:0,
             });
             await Contributors.create({
                 article_id: article.article_id,
@@ -269,7 +311,9 @@ export const createArticle = async (req, res) => {
                     comment : "",
                     keywords : keywords,
                     workflow_phase: "submitted",
-                    status: "not reviewed"
+                    status: "not reviewed",
+                    date_published:new Date(),
+                    cite:0,
                 }
             });
         } catch (error) {

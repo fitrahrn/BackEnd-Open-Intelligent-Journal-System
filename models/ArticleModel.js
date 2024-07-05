@@ -32,7 +32,9 @@ const Article = db.define('article',{
     comment: DataTypes.STRING,
     keywords: DataTypes.STRING,
     workflow_phase :DataTypes.STRING,
-    status:DataTypes.STRING
+    status:DataTypes.STRING,
+    date_published:DataTypes.DATEONLY,
+    cite:DataTypes.INTEGER
 
 }, {
     freezeTableName : true, // memaksa untuk menginfer nama model sebagai nama tabel

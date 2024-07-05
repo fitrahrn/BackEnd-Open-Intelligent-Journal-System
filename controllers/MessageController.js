@@ -19,7 +19,7 @@ export const getMessageFromParticipantId = async(req, res) => {
     try {
         const response = await Message.findAll({
             where : {
-                participant_id: req.params.id
+                user: req.params.id
             }
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
