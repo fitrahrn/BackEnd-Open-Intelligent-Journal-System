@@ -8,10 +8,10 @@ import {
 import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
-router.get("/discussion/:id",getDiscussionFromReviewsId);
-router.post("/discussion",createDiscussion);
-router.patch("/discussion/:id",updateDiscussion);
-router.delete("/discussion/:id",deleteDiscussion);
+router.get("/discussion/:id",verifyToken,getDiscussionFromReviewsId);
+router.post("/discussion",verifyToken,createDiscussion);
+router.patch("/discussion/:id",verifyToken,updateDiscussion);
+router.delete("/discussion/:id",verifyToken,deleteDiscussion);
 
 
 export default router;

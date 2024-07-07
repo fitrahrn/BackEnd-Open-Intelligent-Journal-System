@@ -10,11 +10,11 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/message/:id",getMessageFromDiscussionId);
-router.get("/message/user/:id",getMessageFromParticipantId);
-router.post("/message",createMessage);
-router.patch("/message/:id",updateMessage);
-router.delete("/message/:id",deleteMessage);
+router.get("/message/:id",verifyToken,getMessageFromDiscussionId);
+router.get("/message/user/:id",verifyToken,getMessageFromParticipantId);
+router.post("/message",verifyToken,createMessage);
+router.patch("/message/:id",verifyToken,updateMessage);
+router.delete("/message/:id",verifyToken,deleteMessage);
 
 
 export default router;

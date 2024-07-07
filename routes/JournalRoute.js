@@ -13,10 +13,10 @@ const router = express.Router();
 
 router.get("/journals", getJournals);
 router.get("/journal/:path",getJournalsByPath);
-router.get("/journal",getJournalsByUser);
-router.post("/journal",createJournal);
-router.patch("/journal/:path",updateJournal);
-router.delete("/journal/:path",deleteJournal);
+router.get("/journal",verifyToken,getJournalsByUser);
+router.post("/journal",verifyToken,createJournal);
+router.patch("/journal/:path",verifyToken,updateJournal);
+router.delete("/journal/:path",verifyToken,deleteJournal);
 
 
 export default router;

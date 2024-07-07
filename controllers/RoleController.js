@@ -25,7 +25,6 @@ export const getRolesRequest = async(req, res) => {
             });
             response[i].journal_title= journalResponse.title
         }
-        console.log(response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -75,7 +74,7 @@ export const getRoleFromUser = async(req, res) => {
             include:[{
                 model:Journal,
                 required: true,
-                attributes: ["journal_id","title"]
+                attributes: ["journal_id","title","path"]
             }],
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);

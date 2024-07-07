@@ -14,8 +14,8 @@ const router = express.Router();
 router.get("/issue/id/:id", getIssueById);
 router.get("/issue/:journal",getIssueByJournal);
 router.get("/issue/:journal/:volume/:number",getIssueByVolumeNumber)
-router.post("/issue/:journal",createIssue);
-router.patch("/issue/:id",updateIssue);
-router.delete("/issue/:id",deleteIssue);
+router.post("/issue/:journal",verifyToken,createIssue);
+router.patch("/issue/:id",verifyToken,updateIssue);
+router.delete("/issue/:id",verifyToken,deleteIssue);
 
 export default router;

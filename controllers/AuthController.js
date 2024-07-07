@@ -100,6 +100,7 @@ export const logout = async (req, res) => {
     if(!user) return res.sendStatus(204);
 
     res.clearCookie('refreshToken');
+    res.clearCookie('username');
     return res.sendStatus(200);
 }
 

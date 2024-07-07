@@ -5,7 +5,6 @@ export const verifyToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
     if(token == null) return res.sendStatus(401);
     jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-        console.log(err.message)
         if(err) return res.sendStatus(403);
         req.username = decoded.username;
         next();

@@ -10,11 +10,11 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/reviews/:id",getReviewsFromArticleId);
-router.get("/review/:id/:rounds",getReviewFromReviewRounds);
-router.post("/reviews",createReviews);
-router.patch("/reviews/:id",updateReviews);
-router.delete("/reviews/:id",deleteReviews);
+router.get("/reviews/:id",verifyToken,getReviewsFromArticleId);
+router.get("/review/:id/:rounds",verifyToken,getReviewFromReviewRounds);
+router.post("/reviews",verifyToken,createReviews);
+router.patch("/reviews/:id",verifyToken,updateReviews);
+router.delete("/reviews/:id",verifyToken,deleteReviews);
 
 
 export default router;

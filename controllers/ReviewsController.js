@@ -4,7 +4,6 @@ import Reviews from "../models/ReviewsModel.js";
 import User from "../models/UserModel.js";
 
 export const getReviewsFromArticleId = async(req, res) => {
-    
     try {
         const response = await Reviews.findAll({
             where : {
@@ -12,18 +11,16 @@ export const getReviewsFromArticleId = async(req, res) => {
             },
             include:[{
                 model:Reviewers,
-                required:true,
                 include:[{
                     model:User,
-                    required:true,
+
                     attributes:["user_id","name"]
-            }]
+                }]
             }]
         }); // seluruh atribut same as SELECT * FROM
-        
         res.status(200).json(response);
     } catch (error) {
-        console.log(error.message)
+
         res.status(500).json(error.message);
     }
 }

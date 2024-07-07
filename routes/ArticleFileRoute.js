@@ -10,11 +10,11 @@ import {verifyToken} from "../middleware/VerifyToken.js";
 
 const router = express.Router();
 
-router.get("/article_file/:id",getArticleFileFromArticleId);
-router.post("/article_file/:id",getArticleFileFromPhase);
-router.post("/article_file",createArticleFile);
-router.patch("/article_file/:id",updateArticleFile);
-router.delete("/article_file/:id",deleteArticleFile);
+router.get("/article_file/:id",verifyToken,getArticleFileFromArticleId);
+router.post("/article_file/:id",verifyToken,getArticleFileFromPhase);
+router.post("/article_file",verifyToken,createArticleFile);
+router.patch("/article_file/:id",verifyToken,updateArticleFile);
+router.delete("/article_file/:id",verifyToken,deleteArticleFile);
 
 
 export default router;

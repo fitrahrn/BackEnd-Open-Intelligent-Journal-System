@@ -7,7 +7,28 @@ import Issue from "../models/IssueModel.js"
 import querystring from "querystring"
 import Contributors from "../models/ContributorsModel.js";
 import User from "../models/UserModel.js";
-
+import ArticleFile from "../models/ArticleFileModel.js"
+export const addCitation= async(req,res)=>{
+    try {
+        let response = await Article.findOne({
+            where : {
+                article_id : req.params.id
+            },
+            attributes:['cite']
+        });
+        await Article.update({
+            status: req.body.status,
+            cite:response.cite+1
+        }, {
+            where : {
+                article_id: req.params.id
+            }
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
 export const getArticleById = async(req, res) => {
     try {
         let response = await Article.findOne({
@@ -299,6 +320,11 @@ export const createArticle = async (req, res) => {
                     user_id: contributors,
                 })
             }
+            await ArticleFile.create({
+                article_id: article.article_id,
+                article_path: article.article_path,
+                phase:"submitted"
+            })
             res.status(200).json({msg: "Article created successfully",
                 data: {
                     article_id: findLastArticle+1,
