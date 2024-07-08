@@ -174,20 +174,53 @@ export const getArticlesByIssue = async(req, res) => {
         const issueResponse = await Issue.findOne({
             where : {
                 [Op.and]:{
+                    journal_id: journalResponse.journal_id,
                     volume : req.params.volume,
                     number : req.params.number
                 }
             }
         });
         if(!issueResponse) return res.status(409).json({msg: "Issue not found"});
-        const response = await Article.findAll({
+        let response = await Article.findAll({
             where : {
                 [Op.and]:{
                     issue_id : issueResponse.issue_id,
                     journal_id : journalResponse.journal_id
                 }
             }
+
         });
+        response =  JSON.parse(JSON.stringify(response))
+        
+        for(let i=0;i<response.length;i++){
+            let articles = [];
+            const authorResponse = await Contributors.findAll({
+                where : {
+                    article_id : response[i].article_id
+                },
+                include:[{
+                    model:User,
+                    required: true,
+                    attributes:['name'],
+                }],
+
+            });
+            //response.author = {}
+            for(let j=0;j<authorResponse.length;j++){
+                if(j<authorResponse.length-1) articles.push(authorResponse[j].user.name + ', ')
+                else articles.push(authorResponse[j].user.name)
+            }
+            response[i].authors = articles
+            const issueResponse = await Issue.findOne({
+                where : {
+                    issue_id : response[i].issue_id
+                }
+    
+            });
+            response[i].year = issueResponse.year
+            response[i].volume = issueResponse.volume
+            response[i].issue = issueResponse.number
+        }
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -271,9 +304,6 @@ export const createArticle = async (req, res) => {
         where: {
             [Op.and]:{
                 journal_id: findJournal.journal_id,
-                date_published : {
-                    [Op.lt]:'2001-01-02'
-                },
                 appear: false
             }
         }

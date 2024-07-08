@@ -4,7 +4,7 @@ import Issue from "../models/IssueModel.js"
 import Journal from "../models/JournalModel.js"
 import User from "../models/UserModel.js"
 import querystring from "querystring"
-
+import { Op } from "sequelize";
 
 export const getIssueById = async(req, res) => {
     try {
@@ -50,7 +50,8 @@ export const getIssueByJournal = async(req, res) => {
         const response = await Issue.findAll({
             where : {
                 journal_id : journalResponse.dataValues.journal_id
-            }
+            },
+            order: [['date_published']],
         });
         res.status(200).json(response);
     } catch (error) {
