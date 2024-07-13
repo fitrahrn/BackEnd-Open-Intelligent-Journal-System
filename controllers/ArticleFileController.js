@@ -1,6 +1,8 @@
 import ArticleFile from "../models/ArticleFileModel.js";
 import { Op } from "sequelize";
-
+import Article from "../models/ArticleModel.js";
+import path from "path"
+import fs from "fs"
 export const getArticleFileFromArticleId = async(req, res) => {
     
     try {
@@ -35,26 +37,45 @@ export const getArticleFileFromPhase = async(req, res) => {
 
 
 export const createArticleFile = async (req,res)=>{
-    const { article_id,article_path,phase} = req.body;
+    const { article_id} = req.body;
     if (!(article_id)) return res.status(400).json({msg: "All input is required"});
-    try{
+    const file = req.files.file;
+    const fileSize = file.data.length;
+    const extension = path.extname(file.name);
+    const fileName = "Article-"+file.md5 + extension;
+    const file_path = `${req.protocol}://${req.get("host")}/articles/${fileName}`;
+    const allowedType = ['.pdf', '.doc', '.docx','.xml'];
+    
+    if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});
+    if(fileSize > 15000000) return res.status(422).json({msg : "Size of document must be less than 10 MB"});
+    const article = await Article.findOne({
+        where : {
+            article_id : article_id
+        }
+    });
+    if(!article) return res.status(404).json({msg : "No Article File Found"});
+    file.mv(`./public/articles/${fileName}`, async (error) => {
+        if (error) return res.status(500).json({ msg: error.message });
+        try{
 
-        await ArticleFile.create({
-            article_id:article_id,
-            article_path:article_path,
-            phase:phase
-            
-        });
-        res.status(200).json({msg: "New article file added successfully",
-            data: {
+            await ArticleFile.create({
                 article_id:article_id,
-                article_path:article_path,
-                phase:phase
-            }
-        });
-    } catch (error) {
-        res.status(500).json({msg: "article file failed to add"});
-    }
+                article_path:file_path,
+                phase:article.workflow_phase,
+                
+            });
+            res.status(200).json({msg: "New article file added successfully",
+                data: {
+                    article_id:article_id,
+                    article_path:file_path,
+                    phase:article.workflow_phase,
+                }
+            });
+        } catch (error) {
+            res.status(500).json({msg: "article file failed to add"});
+        }
+    });
+    
 }
 export const updateArticleFile = async (req,res)=>{
     try {

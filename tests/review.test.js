@@ -1,4 +1,5 @@
 import request from "supertest";
+import jwt from 'jsonwebtoken';
 import app from "../index.js";
 import { jest } from '@jest/globals';
 import SequelizeMock from "sequelize-mock";
@@ -38,7 +39,8 @@ const response_reviews={
     article_file_path:"http://localhost:3001/articles/Article-d16b8a0d8435498a676f557a83e2bffd.pdf"
 
 }
-
+const secretKey = process.env.TOKEN_SECRET; // Replace with your actual secret key
+const token = jwt.sign({ username: 'testuser' }, secretKey, { expiresIn: '1m' });
 describe('Review Controller', () => {
     describe('GET /reviews/:id', () => {
         it("mock all model", () => {
@@ -47,12 +49,14 @@ describe('Review Controller', () => {
             jest.spyOn(Reviews, "create").mockResolvedValue(array_reviews[0]);
             jest.spyOn(Reviews, "update").mockResolvedValue(array_reviews[0]);
             jest.spyOn(Reviews, "destroy").mockResolvedValue(1);
-            
-        })
+        });
+
         it('should return reviews for a given article ID', async () => {
             Reviews.findAll.mockResolvedValue([array_reviews[0]]);
 
-            const response = await request(app).get('/reviews/1');
+            const response = await request(app)
+                .get('/reviews/1')
+                .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual([array_reviews[0]]);
@@ -61,7 +65,9 @@ describe('Review Controller', () => {
         it('should return 500 if there is an error', async () => {
             Reviews.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/reviews/1');
+            const response = await request(app)
+                .get('/reviews/1')
+                .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -72,7 +78,9 @@ describe('Review Controller', () => {
         it('should return a review for a given article ID and review rounds', async () => {
             Reviews.findOne.mockResolvedValue(array_reviews[0]);
 
-            const response = await request(app).get('/review/1/1');
+            const response = await request(app)
+                .get('/review/1/1')
+                .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(array_reviews[0]);
@@ -81,20 +89,23 @@ describe('Review Controller', () => {
         it('should return 500 if there is an error', async () => {
             Reviews.findOne.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/review/1/1');
+            const response = await request(app)
+                .get('/review/1/1')
+                .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
         });
     });
 
-    describe('POST /review', () => {
+    describe('POST /reviews', () => {
         it('should create a new review', async () => {
             Reviews.findAll.mockResolvedValue([array_reviews[0]]);
             Reviews.create.mockResolvedValue(array_reviews[2]);
 
             const response = await request(app)
                 .post('/reviews')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     article_id: 1,
                     article_file_path: "http://localhost:3001/articles/Article-d16b8a0d8435498a676f557a83e2bffd.pdf",
@@ -102,8 +113,8 @@ describe('Review Controller', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
-                data:response_reviews,
-                msg:"New review created successfully"
+                data: response_reviews,
+                msg: "New review created successfully"
             });
         });
 
@@ -112,6 +123,7 @@ describe('Review Controller', () => {
 
             const response = await request(app)
                 .post('/reviews')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     article_id: 1,
                     article_file_path: "http://localhost:3001/articles/Article-d16b8a0d8435498a676f557a83e2bffd.pdf",
@@ -122,14 +134,15 @@ describe('Review Controller', () => {
         });
     });
 
-    describe('PATCH /review/:id', () => {
+    describe('PATCH /reviews/:id', () => {
         it('should update a review', async () => {
             Reviews.findOne.mockResolvedValue(array_reviews[0]);
             Reviews.update.mockResolvedValue([array_reviews[0]]);
 
             const response = await request(app)
                 .patch('/reviews/1')
-                .send({ article_file_path: "http://localhost:3001/articles/Article-998453110df006af30d8cabafbea09eb.pdf"});
+                .set('Authorization', `Bearer ${token}`)
+                .send({ article_file_path: "http://localhost:3001/articles/Article-998453110df006af30d8cabafbea09eb.pdf" });
 
             expect(response.status).toBe(200);
             expect(response.body.msg).toBe('Review updated');
@@ -141,6 +154,7 @@ describe('Review Controller', () => {
 
             const response = await request(app)
                 .patch('/reviews/1')
+                .set('Authorization', `Bearer ${token}`)
                 .send({ article_file_path: "http://localhost:3001/articles/Article-998453110df006af30d8cabafbea09eb.pdf" });
 
             expect(response.status).toBe(500);
@@ -148,12 +162,14 @@ describe('Review Controller', () => {
         });
     });
 
-    describe('DELETE /review/:id', () => {
+    describe('DELETE /reviews/:id', () => {
         it('should delete a review', async () => {
             Reviews.findOne.mockResolvedValue(array_reviews[0]);
             Reviews.destroy.mockResolvedValue(1);
 
-            const response = await request(app).delete('/reviews/1');
+            const response = await request(app)
+                .delete('/reviews/1')
+                .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body.msg).toBe('Reviews Deleted Successfully');
@@ -162,7 +178,9 @@ describe('Review Controller', () => {
         it('should return 500 if there is an error', async () => {
             Reviews.destroy.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).delete('/reviews/1');
+            const response = await request(app)
+                .delete('/reviews/1')
+                .set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');

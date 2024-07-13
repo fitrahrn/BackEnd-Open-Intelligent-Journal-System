@@ -10,7 +10,7 @@ import Reviews from '../models/ReviewsModel';
 import Article from '../models/ArticleModel';
 import Journal from '../models/JournalModel';
 import ReviewersFile from '../models/ReviewersFileModel';
-
+import jwt from 'jsonwebtoken';
 
 const array_user=[{
         user_id: 1,
@@ -186,7 +186,8 @@ const reviewers_file={
     reviewers_file:"http://localhost:3001/articles/Article-34b5ffed24252709897ed965e2ee9516.pdf"
 }
 const DBConnectionMock = new SequelizeMock();
-
+const secretKey = process.env.TOKEN_SECRET; // Replace with your actual secret key
+const token = jwt.sign({ username: 'johndoe' }, secretKey, { expiresIn: '1m' });
 describe('Reviewers Controller', () => {
 
     describe('GET /reviewers/review', () => {
@@ -209,7 +210,7 @@ describe('Reviewers Controller', () => {
             Reviewers.findAll.mockResolvedValue([array_reviewers[0]]);
             Journal.findOne.mockResolvedValue(single_journal);
 
-            const response = await request(app).get('/reviewers/review').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/reviewers/review').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(response_reviewers);
@@ -218,7 +219,7 @@ describe('Reviewers Controller', () => {
         it('should return 500 if there is an error', async () => {
             Reviewers.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/reviewers/review').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/reviewers/review').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -229,7 +230,7 @@ describe('Reviewers Controller', () => {
         it('should return reviewers for a given review ID', async () => {
             Reviewers.findAll.mockResolvedValue([array_reviewers]);
 
-            const response = await request(app).get('/reviewers/1');
+            const response = await request(app).get('/reviewers/1').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual([array_reviewers]);
@@ -238,7 +239,7 @@ describe('Reviewers Controller', () => {
         it('should return 500 if there is an error', async () => {
             Reviewers.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/reviewers/1');
+            const response = await request(app).get('/reviewers/1').set('Authorization', `Bearer ${token}`);;
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -250,7 +251,7 @@ describe('Reviewers Controller', () => {
             User.findOne.mockResolvedValue(array_user[0]);
             Reviewers.findOne.mockResolvedValue(array_reviewers[2]);
 
-            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(array_reviewers[2]);
@@ -259,7 +260,7 @@ describe('Reviewers Controller', () => {
         it('should return 500 if there is an error', async () => {
             User.findOne.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -272,6 +273,7 @@ describe('Reviewers Controller', () => {
 
             const response = await request(app)
                 .post('/reviewers')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     reviews_id: 1,
                     user_id: 1,
@@ -290,6 +292,7 @@ describe('Reviewers Controller', () => {
 
             const response = await request(app)
                 .post('/reviewers')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     reviews_id: 1,
                     user_id: 1,
@@ -309,6 +312,7 @@ describe('Reviewers Controller', () => {
             ReviewersFile.create.mockResolvedValue(reviewers_file);
             const response = await request(app)
                 .patch('/reviewers')
+                .set('Authorization', `Bearer ${token}`)
                 .field('reviewers_id', 1)
                 .field('editor_review', "Check for spelling error")
                 .field('author_review', "Need revisions but its already good")
@@ -326,6 +330,7 @@ describe('Reviewers Controller', () => {
             Reviewers.update.mockResolvedValue(update_reviewers);
             const response = await request(app)
                 .patch('/reviewers')
+                .set('Authorization', `Bearer ${token}`)
                 .field('reviewers_id', 1)
                 .field('editor_review', "Check for spelling error")
                 .field('author_review', "Need revisions but its already good")
@@ -345,6 +350,7 @@ describe('Reviewers Controller', () => {
 
             const response = await request(app)
             .patch('/reviewers')
+            .set('Authorization', `Bearer ${token}`)
             .field('reviewers_id', 1)
             .field('editor_review', "Check for spelling error")
             .field('author_review', "Need revisions but its already good")
@@ -360,6 +366,7 @@ describe('Reviewers Controller', () => {
 
             const response = await request(app)
             .patch('/reviewers')
+            .set('Authorization', `Bearer ${token}`)
             .field('reviewers_id', 1)
             .field('editor_review', "Check for spelling error")
             .field('author_review', "Need revisions but its already good")
@@ -377,7 +384,7 @@ describe('Reviewers Controller', () => {
             Reviewers.findOne.mockResolvedValue(array_reviewers[2]);
             Reviewers.destroy.mockResolvedValue(1);
 
-            const response = await request(app).delete('/reviewers/1');
+            const response = await request(app).delete('/reviewers/1').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body.msg).toBe('Reviewers Deleted Successfully');
@@ -386,7 +393,7 @@ describe('Reviewers Controller', () => {
         it('should return 500 if there is an error', async () => {
             Reviewers.destroy.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).delete('/reviewers/1');
+            const response = await request(app).delete('/reviewers/1').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');

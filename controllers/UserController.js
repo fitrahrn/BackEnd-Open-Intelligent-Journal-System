@@ -7,6 +7,7 @@ import Contributors from "../models/ContributorsModel.js";
 import Article from "../models/ArticleModel.js";
 import Journal from "../models/JournalModel.js";
 import db from "../config/database.js";
+import Role from "../models/RoleModel.js";
 export const getUserByUsername = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -102,7 +103,14 @@ export const getUserWithoutItself = async(req, res) => {
         const response = await User.findAll({
             where : {
                 username :{ [Op.ne]: username } 
-            }
+            },
+            include:[{
+                model:Role,
+                required: true,
+                where : {
+                    author: true
+                },
+            }],
         });
         res.status(200).json(response); 
         

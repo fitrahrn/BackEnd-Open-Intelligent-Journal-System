@@ -151,13 +151,50 @@ export const getArticleByUser = async(req, res) => {
 export const getArticlesByTitle = async(req, res) => {
     const { title} = req.body;
     try {
-        const response = await Article.findAll({
+        let response = await Article.findAll({
             where : {
                 title : {
                     [Op.like] : `%${title}%`
                 }
-            }
+            },
+            include :[{
+                model:Journal,
+                required: true,
+                attributes:['title','path']
+                
+            }],
         });
+        response =  JSON.parse(JSON.stringify(response))
+        
+        for(let i=0;i<response.length;i++){
+            let articles = [];
+            const authorResponse = await Contributors.findAll({
+                where : {
+                    article_id : response[i].article_id
+                },
+                include:[{
+                    model:User,
+                    required: true,
+                    attributes:['name'],
+                }],
+
+            });
+            //response.author = {}
+            for(let j=0;j<authorResponse.length;j++){
+                if(j<authorResponse.length-1) articles.push(authorResponse[j].user.name + ', ')
+                else articles.push(authorResponse[j].user.name)
+            }
+            response[i].authors = articles
+            const issueResponse = await Issue.findOne({
+                where : {
+                    issue_id : response[i].issue_id
+                }
+    
+            });
+            response[i].year = issueResponse.year
+            response[i].volume = issueResponse.volume
+            response[i].issue = issueResponse.number
+        }
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
@@ -223,6 +260,7 @@ export const getArticlesByIssue = async(req, res) => {
         }
         res.status(200).json(response);
     } catch (error) {
+        
         res.status(500).json(error.message);
     }
 }
@@ -278,7 +316,7 @@ export const getArticlesByJournal = async(req, res) => {
 }
 
 export const createArticle = async (req, res) => {
-    const {prefix,title,subtitle,abstract,keywords,contributors} = req.body;
+    const {prefix,title,subtitle,abstract,keywords,contributors,date_published} = req.body;
     if (!(title && abstract)) return res.status(400).json({msg: "All input is required"});
     const username = req.cookies.username;
     const checkTitle = await Article.findOne({
@@ -337,7 +375,7 @@ export const createArticle = async (req, res) => {
                 keywords : keywords,
                 workflow_phase: "submitted",
                 status: "not reviewed",
-                date_published:new Date(),
+                date_published:date_published,
                 cite:0,
             });
             await Contributors.create({
@@ -358,6 +396,7 @@ export const createArticle = async (req, res) => {
             res.status(200).json({msg: "Article created successfully",
                 data: {
                     article_id: findLastArticle+1,
+                    cite:0,
                     journal_id : findJournal.journal_id,
                     issue_id : findIssue.issue_id,
                     prefix: prefix,
@@ -365,11 +404,12 @@ export const createArticle = async (req, res) => {
                     subtitle : subtitle,
                     abstract : abstract,
                     comment : "",
+                    date_published:date_published,
                     keywords : keywords,
                     workflow_phase: "submitted",
                     status: "not reviewed",
-                    date_published:new Date(),
-                    cite:0,
+                    
+                    
                 }
             });
         } catch (error) {

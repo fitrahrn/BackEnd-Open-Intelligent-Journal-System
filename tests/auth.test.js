@@ -13,6 +13,8 @@ bcrypt.genSalt= bcrypGenSalt;
 const bcryptHash = jest.fn().mockResolvedValue(true);
 bcrypt.hash= bcryptHash;
 import jwt from 'jsonwebtoken';
+const secretKey = process.env.TOKEN_SECRET; // Replace with your actual secret key
+const token = jwt.sign({ username: 'johndoe' }, secretKey, { expiresIn: '1m' });
 const jwtSign = jest.fn().mockResolvedValue(true);
 jwt.sign= jwtSign;
 
@@ -283,7 +285,7 @@ describe('Auth Testing', () => {
             journal_id: 1
         }]);
 
-            const response = await request(app).get('/users');
+            const response = await request(app).get('/users').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual([{
@@ -305,7 +307,7 @@ describe('Auth Testing', () => {
         it('should return 500 if there is an error', async () => {
             User.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/users');
+            const response = await request(app).get('/users').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');

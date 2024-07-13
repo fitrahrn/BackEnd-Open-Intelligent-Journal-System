@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../index.js";
+import jwt from 'jsonwebtoken';
 import { jest } from '@jest/globals';
 import Journal from "../models/JournalModel.js";
 import SequelizeMock from "sequelize-mock";
@@ -9,6 +10,8 @@ import path from "path"
 import fs from "fs"
 // Setup Sequelize Mock for the Journal model
 const DBConnectionMock = new SequelizeMock();
+const secretKey = process.env.TOKEN_SECRET; // Replace with your actual secret key
+const token = jwt.sign({ username: 'testuser' }, secretKey, { expiresIn: '1m' });
 const array_journal=[
         {
             journal_id: 1,
@@ -202,14 +205,14 @@ describe("Journal Controller", () => {
         })
         it("should return all journals", async () => {
             Journal.findAll.mockResolvedValue(array_journal);
-            const res = await request(app).get("/journals");
+            const res = await request(app).get("/journals").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual(array_journal);
         });
 
         it("should handle errors", async () => {
             Journal.findAll.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).get("/journals");
+            const res = await request(app).get("/journals").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(500);
             expect(res.body).toEqual("Database Error");
         });
@@ -219,18 +222,18 @@ describe("Journal Controller", () => {
     describe("GET /journal/:path", () => {
         it("should return journal by path", async () => {
             Journal.findOne.mockResolvedValue(single_journal);
-            const res = await request(app).get("/journal/jictra");
+            const res = await request(app).get("/journal/jictra").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual(single_journal);
         });
         it("should return 404 if not found", async () => {
             Journal.findOne.mockRejectedValue(null);
-            const res = await request(app).get("/journals/jmfs");
+            const res = await request(app).get("/journals/jmfs").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(404);
         });
         it("should handle errors", async () => {
             Journal.findOne.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).get("/journal/jmfs");
+            const res = await request(app).get("/journal/jmfs").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(500);
             expect(res.body).toEqual("Database Error");
         });
@@ -241,14 +244,14 @@ describe("Journal Controller", () => {
             User.findOne.mockResolvedValue(single_user);
             Role.findAll.mockResolvedValue(array_role_with_journal);
 
-            const res = await request(app).get("/journal").set("Cookie", "username=johndoe");
+            const res = await request(app).get("/journal").set("Cookie", "username=johndoe").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual(array_role_with_journal);
         });
 
         it("should handle errors", async () => {
             User.findOne.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).get("/journals").set("Cookie", "username=testuser");
+            const res = await request(app).get("/journals").set("Cookie", "username=testuser").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(500);
             expect(res.body).toEqual("Database Error");
         });
@@ -259,7 +262,7 @@ describe("Journal Controller", () => {
             Journal.findOne.mockResolvedValue(null);
             Journal.create.mockResolvedValue(single_journal);
 
-            const res = await request(app).post("/journal")
+            const res = await request(app).post("/journal").set('Authorization', `Bearer ${token}`)
             .field('title', "Journal of ICT Research and Applications")
             .field('initials', "jictra",)
             .field('abbreviation', "jictra")
@@ -281,7 +284,7 @@ describe("Journal Controller", () => {
         });
 
         it("should handle validation errors", async () => {
-            const res = await request(app).post("/journal").send({});
+            const res = await request(app).post("/journal").set('Authorization', `Bearer ${token}`).send({});
             expect(res.statusCode).toEqual(400);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "All input is required"
@@ -290,7 +293,7 @@ describe("Journal Controller", () => {
 
         it("should handle existing journal errors", async () => {
             Journal.findOne.mockResolvedValue(single_journal);
-            const res = await request(app).post("/journal")
+            const res = await request(app).post("/journal").set('Authorization', `Bearer ${token}`)
             .field('title', "Journal of ICT Research and Applications")
             .field('initials', "jictra",)
             .field('abbreviation', "jictra")
@@ -311,7 +314,7 @@ describe("Journal Controller", () => {
         it("should handle existing database errors", async () => {
             Journal.findOne.mockResolvedValue(null);
             Journal.create.mockRejectedValue(new Error('Something went wrong'));
-            const res = await request(app).post("/journal")
+            const res = await request(app).post("/journal").set('Authorization', `Bearer ${token}`)
             .field('title', "Journal of ICT Research and Applications")
             .field('initials', "jictra",)
             .field('abbreviation', "jictra")
@@ -336,7 +339,7 @@ describe("Journal Controller", () => {
             Journal.findOne.mockResolvedValue(single_journal);
             Journal.update.mockResolvedValue(update_journal);
 
-            const res = await request(app).patch("/journal/jictra")
+            const res = await request(app).patch("/journal/jictra").set('Authorization', `Bearer ${token}`)
             .field('title', "Journal of Engineering and Technological Sciences")
             .field('initials', "jictra",)
             .field('abbreviation', "jictra")
@@ -361,7 +364,7 @@ describe("Journal Controller", () => {
             Journal.findOne.mockResolvedValue(single_journal);
             Journal.update.mockResolvedValue(update_journal);
 
-            const res = await request(app).patch("/journal/jictra")
+            const res = await request(app).patch("/journal/jictra").set('Authorization', `Bearer ${token}`)
             .field('title', "Journal of Engineering and Technological Sciences")
             .field('initials', "jictra",)
             .field('abbreviation', "jictra")
@@ -383,7 +386,7 @@ describe("Journal Controller", () => {
 
         it("should handle journal not found", async () => {
             Journal.findOne.mockResolvedValue(null);
-            const res = await request(app).patch("/journal/jmfs").send({
+            const res = await request(app).patch("/journal/jmfs").set('Authorization', `Bearer ${token}`).send({
                 title: "Updated Journal",
                 description: "This is an updated journal.",
                 journal_path: "sample-journal",
@@ -398,7 +401,7 @@ describe("Journal Controller", () => {
         it("should handle errors", async () => {
             Journal.findOne.mockResolvedValue(single_journal);
             Journal.update.mockRejectedValue(new Error("Database Error"));
-            const res = await request(app).patch("/journal/jictra")
+            const res = await request(app).patch("/journal/jictra").set('Authorization', `Bearer ${token}`)
             .field('title', "Journal of Engineering and Technological Sciences")
             .field('initials', "jictra",)
             .field('abbreviation', "jictra")
@@ -422,7 +425,7 @@ describe("Journal Controller", () => {
             Journal.findOne.mockResolvedValue(single_journal_without_image);
             Journal.destroy.mockResolvedValue(1);
 
-            const res = await request(app).delete("/journal/jictra");
+            const res = await request(app).delete("/journal/jictra").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(200);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "Journal Deleted Successfully"
@@ -431,7 +434,7 @@ describe("Journal Controller", () => {
 
         it("should handle not found", async () => {
             Journal.findOne.mockResolvedValue(null);
-            const res = await request(app).delete("/journal/jmfs");
+            const res = await request(app).delete("/journal/jmfs").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(404);
             expect(res.body).toEqual(expect.objectContaining({
                 msg: "No Journal Found"
@@ -440,7 +443,7 @@ describe("Journal Controller", () => {
         it("should handle error", async () => {
             Journal.findOne.mockResolvedValue(single_journal_without_image);
             Journal.destroy.mockRejectedValue(new Error("Database Error"))
-            const res = await request(app).delete("/journal/jictra");
+            const res = await request(app).delete("/journal/jictra").set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(500);
             expect(res.body).toEqual("Database Error");
         });

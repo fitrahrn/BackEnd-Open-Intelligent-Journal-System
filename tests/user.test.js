@@ -4,7 +4,7 @@ import { jest } from '@jest/globals';
 import SequelizeMock from "sequelize-mock";
 import bcrypt from 'bcrypt';
 import User from '../models/UserModel';
-
+import jwt from 'jsonwebtoken';
 const dbMock = new SequelizeMock();
 const user = {
     user_id: 1,
@@ -73,6 +73,8 @@ const bcrypGenSalt = jest.fn().mockResolvedValue(true);
 bcrypt.genSalt= bcrypGenSalt;
 const bcryptHash = jest.fn().mockResolvedValue(true);
 bcrypt.hash= bcryptHash;
+const secretKey = process.env.TOKEN_SECRET; // Replace with your actual secret key
+const token = jwt.sign({ username: 'johndoe' }, secretKey, { expiresIn: '1m' });
 describe('User Controller', () => {
 
     describe('GET /user/get/username', () => {
@@ -83,7 +85,7 @@ describe('User Controller', () => {
         it('should return user details by username', async () => {
             User.findOne.mockResolvedValue(user);
 
-            const response = await request(app).get('/user/get/username').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/user/get/username').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(user);
@@ -92,7 +94,7 @@ describe('User Controller', () => {
         it('should return 500 if there is an error', async () => {
             User.findOne.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/user/get/username').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/user/get/username').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -103,7 +105,7 @@ describe('User Controller', () => {
         it('should return users excluding the logged-in user', async () => {
             User.findAll.mockResolvedValue([otherUser[1]]);
 
-            const response = await request(app).get('/get/contributors').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/get/contributors').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual([otherUser[1]]);
@@ -112,7 +114,7 @@ describe('User Controller', () => {
         it('should return 500 if there is an error', async () => {
             User.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/get/contributors').set('Cookie', ['username=johndoe']);
+            const response = await request(app).get('/get/contributors').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -123,7 +125,7 @@ describe('User Controller', () => {
         it('should find users by name', async () => {
             User.findAll.mockResolvedValue(otherUser);
 
-            const response = await request(app).post('/user/search').send({ name: 'John' });
+            const response = await request(app).post('/user/search').send({ name: 'John' }).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(otherUser);
@@ -132,7 +134,7 @@ describe('User Controller', () => {
         it('should return 500 if there is an error', async () => {
             User.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).post('/user/search').send({ name: 'John' });
+            const response = await request(app).post('/user/search').send({ name: 'John' }).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -148,6 +150,7 @@ describe('User Controller', () => {
 
             const response = await request(app)
                 .patch('/user/update')
+                .set('Authorization', `Bearer ${token}`)
                 .set('Cookie', ['username=johndoe'])
                 .field('name', "Updated Name")
                 .field('public_name', "Updated Public Name")
@@ -173,6 +176,7 @@ describe('User Controller', () => {
 
             const response = await request(app)
                 .patch('/user/update')
+                .set('Authorization', `Bearer ${token}`)
                 .field('name', "Updated Name")
                 .field('public_name', "Updated Public Name")
                 .field('email', "updated@example.com")
@@ -196,6 +200,7 @@ describe('User Controller', () => {
 
             const response = await request(app)
                 .patch('/user/update')
+                .set('Authorization', `Bearer ${token}`)
                 .set('Cookie', ['username=johndoe'])
                 .field('name', "Updated Name")
                 .field('public_name', "Updated Public Name")
@@ -221,6 +226,7 @@ describe('User Controller', () => {
             User.update.mockRejectedValue(new Error('Something went wrong'));
             const response = await request(app)
                 .patch('/user/update')
+                .set('Authorization', `Bearer ${token}`)
                 .set('Cookie', ['username=johndoe'])
                 .field('name', "Updated Name")
                 .field('public_name', "Updated Public Name")

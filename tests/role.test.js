@@ -6,7 +6,7 @@ import Role from '../models/RoleModel';
 import User from '../models/UserModel';
 import Journal from '../models/JournalModel';
 import { Op } from 'sequelize';
-
+import jwt from 'jsonwebtoken';
 // Mock the database connection
 const DBConnectionMock = new SequelizeMock();
 
@@ -103,7 +103,8 @@ const request_answer={role_id: 1,
     author: false,
     reader: true,
     request: "reviewer",}
-
+const secretKey = process.env.TOKEN_SECRET; // Replace with your actual secret key
+const token = jwt.sign({ username: 'johndoe' }, secretKey, { expiresIn: '1m' });
 
 describe('Role Controller', () => {
     describe('GET /role/request', () => {
@@ -119,7 +120,7 @@ describe('Role Controller', () => {
         it('should return roles with requests', async () => {
             Role.findAll.mockResolvedValue(request_roles);
 
-            const response = await request(app).get('/role/request');
+            const response = await request(app).get('/role/request').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(request_roles);
@@ -128,7 +129,7 @@ describe('Role Controller', () => {
         it('should return 500 if there is an error', async () => {
             Role.findAll.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/role/request');
+            const response = await request(app).get('/role/request').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -141,7 +142,7 @@ describe('Role Controller', () => {
             Journal.findOne.mockResolvedValue(array_journals[0]);
             Role.findAll.mockResolvedValue(array_roles_user);
 
-            const response = await request(app).get('/role/reviewers/test-path');
+            const response = await request(app).get('/role/reviewers/test-path').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(array_roles_user);
@@ -150,7 +151,7 @@ describe('Role Controller', () => {
         it('should return 500 if there is an error', async () => {
             Journal.findOne.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/role/reviewers/test-path');
+            const response = await request(app).get('/role/reviewers/test-path').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -162,7 +163,7 @@ describe('Role Controller', () => {
             User.findOne.mockResolvedValue(array_users[0]);
             Role.findAll.mockResolvedValue([array_roles[0]]);
 
-            const response = await request(app).get('/role/user').set('Cookie', ['username=testuser']);
+            const response = await request(app).get('/role/user').set('Cookie', ['username=testuser']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual([array_roles[0]]);
@@ -171,7 +172,7 @@ describe('Role Controller', () => {
         it('should return 500 if there is an error', async () => {
             User.findOne.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).get('/role/user').set('Cookie', ['username=testuser']);
+            const response = await request(app).get('/role/user').set('Cookie', ['username=testuser']).set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
@@ -186,6 +187,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .post('/role')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     journal_id: 1
                 });
@@ -211,6 +213,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .post('/role')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     journal_id: 1
                 });
@@ -229,6 +232,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .patch('/role/test-path')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     administrator: true,
                     lead_editor: false,
@@ -249,6 +253,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .patch('/role/1')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     administrator: true,
                     lead_editor: false,
@@ -272,6 +277,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .post('/role/request')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     journal_id: 1,
                     request: 'editor'
@@ -289,6 +295,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .post('/role/request')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     journal_id: 1,
                     request: 'author'
@@ -303,6 +310,7 @@ describe('Role Controller', () => {
             const response = await request(app)
                 .post('/role/request')
                 .set('Cookie', ['username=testuser'])
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     journal_id: 1,
                     request: 'editor'
@@ -320,6 +328,7 @@ describe('Role Controller', () => {
 
             const response = await request(app)
                 .post('/role/request/answer')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     role_id: 1,
                     accept: true
@@ -335,6 +344,7 @@ describe('Role Controller', () => {
 
             const response = await request(app)
                 .post('/role/request/answer')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     role_id: 1,
                     accept: true
@@ -350,6 +360,7 @@ describe('Role Controller', () => {
 
             const response = await request(app)
                 .post('/role/request/answer')
+                .set('Authorization', `Bearer ${token}`)
                 .send({
                     role_id: 1,
                     accept: true
@@ -365,7 +376,7 @@ describe('Role Controller', () => {
             Role.findOne.mockResolvedValue(array_roles[0]);
             Role.destroy.mockResolvedValue(1);
 
-            const response = await request(app).delete('/role/1');
+            const response = await request(app).delete('/role/1').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(200);
             expect(response.body.msg).toBe('Role Deleted Successfully');
@@ -374,7 +385,7 @@ describe('Role Controller', () => {
         it('should return 500 if there is an error', async () => {
             Role.destroy.mockRejectedValue(new Error('Something went wrong'));
 
-            const response = await request(app).delete('/role/1');
+            const response = await request(app).delete('/role/1').set('Authorization', `Bearer ${token}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');

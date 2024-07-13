@@ -7,6 +7,7 @@ import Reviews from "../models/ReviewsModel.js";
 import Article from "../models/ArticleModel.js";
 import Journal from "../models/JournalModel.js";
 import ReviewersFile from "../models/ReviewersFileModel.js";
+import { Op } from "sequelize";
 export const getReviewersFromUser = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -63,6 +64,19 @@ export const getReviewersFromReviewsId = async(req, res) => {
         res.status(500).json(error.message);
     }
 }
+export const getReviewersFromReviewersId = async(req, res) => {
+    
+    try {
+        const response = await Reviewers.findOne({
+            where : {
+                reviewers_id: req.params.id
+            },
+        }); // seluruh atribut same as SELECT * FROM
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
 
 export const getReviewersFromUserReviewers = async(req, res) => {
     const username = req.cookies.username;
@@ -87,6 +101,15 @@ export const getReviewersFromUserReviewers = async(req, res) => {
 export const addReviewers = async (req,res)=>{
     const { reviews_id,user_id,date_assigned,date_due} = req.body;
     if (!(reviews_id && user_id && date_assigned && date_due)) return res.status(400).json({msg: "All input is required"});
+    const reviewersResponse = await Reviewers.findOne({
+        where : {
+            [Op.and]:{
+                reviews_id: reviews_id,
+                user_id: user_id
+            }
+        }
+    });
+    if(reviewersResponse) return res.status(409).json({msg: "Reviewers already added"});
     try{
 
         await Reviewers.create({
@@ -155,6 +178,7 @@ export const writeReviews = async (req,res)=>{
                     data: req.body
                 });
             } catch (error) {
+                console.log(error.message)
                 res.status(500).json({msg: "Reviewers failed to update"});
             }
         });
@@ -174,7 +198,7 @@ export const writeReviews = async (req,res)=>{
                 date_completed: date_completed,
             }, {
                 where : {
-                    id : reviewers_id
+                    reviewers_id: reviewers_id
                 }
             });
             res.status(200).json({msg: "Reviewers updated",
