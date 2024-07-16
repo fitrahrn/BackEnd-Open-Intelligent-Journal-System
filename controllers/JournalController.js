@@ -19,6 +19,7 @@ export const getJournalsByPath = async(req, res) => {
                 path : req.params.path
             }
         });
+        if (!response) return res.status(404).json({msg: "Journal Not found"});
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error.message);
