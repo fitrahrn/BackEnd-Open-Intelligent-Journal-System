@@ -81,16 +81,18 @@ export const getReviewersFromReviewersId = async(req, res) => {
 export const getReviewersFromUserReviewers = async(req, res) => {
     const username = req.cookies.username;
     try {
-        const userResponse = await User.findOne({
-            where : {
-                username : username
-            }
-        })
         const response = await Reviewers.findOne({
             where : {
-                reviews_id: req.params.id,
-                user_id: userResponse.user_id
-            }
+                reviews_id: req.params.id
+            },
+            include:[{
+                model:User,
+                required: true,
+                attributes:['name','email'],
+                where:{
+                    username: username
+                }
+            }],
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
     } catch (error) {

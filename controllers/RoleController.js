@@ -50,7 +50,7 @@ export const getReviewersFromJournal = async(req, res) => {
             include:[{
                 model:User,
                 required: true,
-                attributes:['name','user_id']
+                attributes:['name','user_id','email']
             }],
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
