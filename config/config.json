@@ -1,9 +1,9 @@
 {
 	"db_config": {
 		"connectionLimit": 10,
-		"host": "localhost",
+		"host": "34.128.76.248",
 		"user": "root",
-		"password": "",
+		"password": ">[mM*>Xn'.nU^:O$",
 		"database": "oijs",
 		"timezone": "utc"
 	}

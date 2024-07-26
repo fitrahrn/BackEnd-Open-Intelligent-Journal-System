@@ -32,17 +32,18 @@ export const register = async (req, res) => {
             country:country,
         });
         await Role.create({
-            user_id: user.dataValues.user_id,
+            user_id: user.user_id,
             journal_id: journal_id,
             administrator: false,
             lead_editor:false,
+            editor:false,
             reviewer: false,
             author:false,
             reader:true
         });
         res.status(200).json({msg: "Registration Successful"});
     } catch (error) {
-        res.status(500).json({msg: "Registration failed"});
+        res.status(500).json({msg: "Registration failed", err:error.message});
     }
 }
 

@@ -131,3 +131,4 @@ dist
 
 #public file
 public/
+application_default_credentials.json
