@@ -54,7 +54,7 @@ export const getJournalsByUser = async(req, res) => {
 
 export const createJournal = async (req, res) => {
     const { title,initials, abbreviation, description,journal_path, languages,appear, publisher,issn,e_issn,reg_number} = req.body;
-    // if (!(title && description && journal_path && languages)) return res.status(400).json({msg: "All input is required"});
+    if (!(title && description && journal_path && languages)) return res.status(400).json({msg: "All input is required"});
     const checkTitle = await Journal.findOne({
         where: {
             title: title
@@ -73,7 +73,7 @@ export const createJournal = async (req, res) => {
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = journal_path + extension;
-        const file_path = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+        const file_path = `${req.protocol}s://${req.get("host")}/images/${fileName}`;
         const allowedType = ['.jpg', '.png', '.webp'];
         
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid image format"});
@@ -162,7 +162,7 @@ export const updateJournal = async (req, res) => {
     if(!journal) return res.status(404).json({msg : "No Journal Found"});
     let image_path = journal.image_path
     
-    if(image_path === ""&& req.body.image_path === "") {
+    if(image_path === ""&& req.files === null) {
         try {
             await Journal.update(req.body, {
                 where : {
@@ -207,7 +207,7 @@ export const updateJournal = async (req, res) => {
         file.mv(`./public/images/${fileName}`, (error) => {
             if (error) return res.status(500).json({ msg: error.message });
         });
-        image_path = `${req.protocol}://${req.get("host")}/images/${fileName}`;
+        image_path = `${req.protocol}s://${req.get("host")}/images/${fileName}`;
     }
     // simpan ke database
     

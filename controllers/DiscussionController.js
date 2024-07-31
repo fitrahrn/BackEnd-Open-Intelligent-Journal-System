@@ -52,7 +52,7 @@ export const createDiscussion = async (req,res)=>{
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = "Message-"+file.md5 + extension;
-        const file_path = `${req.protocol}://${req.get("host")}/messages/${fileName}`;
+        const file_path = `${req.protocol}s://${req.get("host")}/messages/${fileName}`;
         const allowedType = ['.pdf', '.doc', '.docx','.xml'];
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "Invalid document format"});
         if(fileSize > 15000000) return res.status(422).json({msg : "Size of document must be less than 10 MB"});

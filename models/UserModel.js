@@ -1,5 +1,3 @@
-// source : https://sequelize.org/docs/v6/core-concepts/model-basics
-//  models adalah abstraksi yang merepresentasikan tabel di dalam database
 import { Sequelize } from "sequelize";
 import db from "../config/database.js"
 import Article from "./ArticleModel.js";

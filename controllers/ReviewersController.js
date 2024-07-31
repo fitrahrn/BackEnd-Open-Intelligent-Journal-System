@@ -149,7 +149,7 @@ export const writeReviews = async (req,res)=>{
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = "Review-"+file.md5 + extension;
-        const file_path = `${req.protocol}://${req.get("host")}/reviews/${fileName}`;
+        const file_path = `${req.protocol}s://${req.get("host")}/reviews/${fileName}`;
         const allowedType = ['.pdf', '.doc', '.docx','.xml'];
         const reviewers = await Reviewers.findOne({
             where : {

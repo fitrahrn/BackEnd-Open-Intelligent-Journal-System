@@ -73,17 +73,18 @@ export const login = async (req, res) => {
         res.cookie('username', username,{
             httpOnly: true,
             sameSite: "None",
-
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60,
+            secure: true
         });
         res.cookie('refreshToken', refreshToken,{
             httpOnly: true,
             sameSite: "None",
-
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60,
+            secure: true
         });
         token=accessToken; 
-        res.status(200).json({ accessToken });
+        const profilePicture=user.profile_picture
+        res.status(200).json({ accessToken,profilePicture });
     } catch (error) {
         res.status(500).json({msg: "Login failed"});
     }
