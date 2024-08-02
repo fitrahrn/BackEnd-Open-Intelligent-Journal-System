@@ -85,46 +85,48 @@ export const createJournal = async (req, res) => {
         if(fileSize > 1500000) return res.status(422).json({msg : "Size of image must be less than 1 MB"});
         file.mv(`./public/images/${fileName}`, async (error) => {
             if (error) return res.status(500).json({ msg: error.message });
-            const filepath=`./public/images/${fileName}`;
-            const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
-            const storagepath = `public/images/${fileName}`;
-            const result = await gcs.upload(filepath, {
-                destination: storagepath,
-                predefinedAcl: 'publicRead', // Set the file to be publicly readable
-                metadata: {
-                    contentType: `image/jpeg`, // Adjust the content type as needed
-                }
-            });
+            
             try {
-              await Journal.create({
-                title: title,
-                initials: initials,
-                abbreviation: abbreviation,
-                description: description,
-                path: journal_path,
-                image_path:file_path,
-                languages: languages,
-                appear: appear,
-                publisher: publisher,
-                issn: issn,
-                e_issn: e_issn,
-                reg_number: reg_number,
+                const filepath=`./public/images/${fileName}`;
+                const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+                const storagepath = `public/images/${fileName}`;
+                const result = await gcs.upload(filepath, {
+                    destination: storagepath,
+                    predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                    metadata: {
+                        contentType: `image/jpeg`, // Adjust the content type as needed
+                    }
+                });
+                await Journal.create({
+                    title: title,
+                    initials: initials,
+                    abbreviation: abbreviation,
+                    description: description,
+                    path: journal_path,
+                    image_path:file_path,
+                    languages: languages,
+                    appear: appear,
+                    publisher: publisher,
+                    issn: issn,
+                    e_issn: e_issn,
+                    reg_number: reg_number,
                 
+                });
+                res.status(200).json({ msg: "Journal Created Successfully",data:{
+                    title: title,
+                    initials: initials,
+                    abbreviation: abbreviation,
+                    description: description,
+                    path: journal_path,
+                    languages: languages,
+                    appear: appear,
+                    publisher: publisher,
+                    issn: issn,
+                    e_issn: e_issn,
+                    reg_number: reg_number,
+                
+                } 
             });
-              res.status(200).json({ msg: "Journal Created Successfully",data:{
-                title: title,
-                initials: initials,
-                abbreviation: abbreviation,
-                description: description,
-                path: journal_path,
-                languages: languages,
-                appear: appear,
-                publisher: publisher,
-                issn: issn,
-                e_issn: e_issn,
-                reg_number: reg_number,
-                
-            } });
             } catch (error) {
               res.status(500).json({msg: "Journal failed to create"});
             }
