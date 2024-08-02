@@ -2,6 +2,11 @@ import Discussion from "../models/DiscussionModel.js";
 import Message from "../models/MessageModel.js";
 import User from "../models/UserModel.js";
 import Reviews from "../models/ReviewsModel.js";
+import { Storage } from "@google-cloud/storage";
+const storage = new Storage({
+  projectId: "oijs-429910",
+  keyFilename: "application_default_credentials.json",
+});
 export const getDiscussionFromReviewsId = async(req, res) => {
     
     try {
@@ -52,45 +57,59 @@ export const createDiscussion = async (req,res)=>{
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = "Message-"+file.md5 + extension;
-        const file_path = `${req.protocol}s://${req.get("host")}/messages/${fileName}`;
+        const file_path = `https://storage.cloud.google.com/oijs-bucket/public/messages/${fileName}`;
         const allowedType = ['.pdf', '.doc', '.docx','.xml'];
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "Invalid document format"});
         if(fileSize > 15000000) return res.status(422).json({msg : "Size of document must be less than 10 MB"});
+        const checkReviews = await Reviews.findOne({
+            where: {
+                reviews_id: reviews_id
+            }
+        });
+        if (!checkReviews) return res.status(409).json({msg: "Reviews id doesn't exist"});
         file.mv(`./public/messages/${fileName}`, async (error) => {
             if (error) return res.status(500).json({ msg: error.message });
-            const checkReviews = await Reviews.findOne({
-                where: {
-                    reviews_id: reviews_id
-                }
-            });
-            if (!checkReviews) return res.status(409).json({msg: "Reviews id doesn't exist"});
-        
-            
-            const discussion =  await Discussion.create({
-                reviews_id:reviews_id,
-                subject: subject,
-                closed:false
+            try{
+                const filepath=`./public/messages/${fileName}`;
+                const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+                const storagepath = `public/messages/${fileName}`;
+                const result = await gcs.upload(filepath, {
+                    destination: storagepath,
+                    predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                    metadata: {
+                        contentType: `application/pdf`, // Adjust the content type as needed
+                    }
+                });
                 
-            });
-            await Message.create({
-                discussion_id: discussion.dataValues.discussion_id,
-                user_id: findUser.dataValues.user_id,
-                message:message,
-                message_file:file_path,
-                date_send:date_send
-            })
-            res.status(200).json({msg: "New discussion created successfully",
-                data: {
+                const discussion =  await Discussion.create({
                     reviews_id:reviews_id,
                     subject: subject,
-                    closed:false,
+                    closed:false
+                    
+                });
+                await Message.create({
                     discussion_id: discussion.dataValues.discussion_id,
                     user_id: findUser.dataValues.user_id,
                     message:message,
                     message_file:file_path,
                     date_send:date_send
-                }
-            });
+                })
+                res.status(200).json({msg: "New discussion created successfully",
+                    data: {
+                        reviews_id:reviews_id,
+                        subject: subject,
+                        closed:false,
+                        discussion_id: discussion.dataValues.discussion_id,
+                        user_id: findUser.dataValues.user_id,
+                        message:message,
+                        message_file:file_path,
+                        date_send:date_send
+                    }
+                });
+            }catch (error) {
+                res.status(500).json({ msg: error.message });
+            }
+            
         });
     }
     else{

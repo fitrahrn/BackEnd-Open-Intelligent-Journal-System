@@ -4,6 +4,11 @@ import fs from "fs"
 import { Op } from "sequelize";
 import User from "../models/UserModel.js"
 import Role from "../models/RoleModel.js"
+import { Storage } from "@google-cloud/storage";
+const storage = new Storage({
+  projectId: "oijs-429910",
+  keyFilename: "application_default_credentials.json",
+});
 export const getJournals = async(req, res) => {
     try {
         const response = await Journal.findAll(); // seluruh atribut same as SELECT * FROM
@@ -73,13 +78,23 @@ export const createJournal = async (req, res) => {
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = journal_path + extension;
-        const file_path = `${req.protocol}s://${req.get("host")}/images/${fileName}`;
+        const file_path = `https://storage.googleapis.com/oijs-bucket/public/profiles/${fileName}`;
         const allowedType = ['.jpg', '.png', '.webp'];
         
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid image format"});
         if(fileSize > 1500000) return res.status(422).json({msg : "Size of image must be less than 1 MB"});
         file.mv(`./public/images/${fileName}`, async (error) => {
             if (error) return res.status(500).json({ msg: error.message });
+            const filepath=`./public/images/${fileName}`;
+            const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+            const storagepath = `public/images/${fileName}`;
+            const result = await gcs.upload(filepath, {
+                destination: storagepath,
+                predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                metadata: {
+                    contentType: `image/jpeg`, // Adjust the content type as needed
+                }
+            });
             try {
               await Journal.create({
                 title: title,
@@ -197,17 +212,26 @@ export const updateJournal = async (req, res) => {
         // validasi
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid image format"});
         if(fileSize > 1500000) return res.status(422).json({msg : "Size of image must be less than 1 MB"});
-        // hapus yang lama
-        if(image_path_split[image_path_split.length - 1] != ''){
-            const filepath = `./public/images/${image_path_split[image_path_split.length - 1]}`;
-            fs.unlinkSync(filepath);
-        }
-
         // terima jurnalnya masukkan ke public
-        file.mv(`./public/images/${fileName}`, (error) => {
+        file.mv(`./public/images/${fileName}`, async (error) => {
             if (error) return res.status(500).json({ msg: error.message });
+            try {
+                const filepath=`./public/images/${fileName}`;
+                const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+                const storagepath = `public/images/${fileName}`;
+                const result = await gcs.upload(filepath, {
+                    destination: storagepath,
+                    predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                    metadata: {
+                        contentType: `image/${extension.replace('.','')}`, // Adjust the content type as needed
+                    }
+                });
+            } catch (error) {
+                res.status(500).json({msg: "User failed to update",err:error.message});
+            }
+            
         });
-        image_path = `${req.protocol}s://${req.get("host")}/images/${fileName}`;
+        image_path = `https://storage.googleapis.com/oijs-bucket/public/images/${fileName}`;
     }
     // simpan ke database
     

@@ -8,6 +8,11 @@ import querystring from "querystring"
 import Contributors from "../models/ContributorsModel.js";
 import User from "../models/UserModel.js";
 import ArticleFile from "../models/ArticleFileModel.js"
+import { Storage } from "@google-cloud/storage";
+const storage = new Storage({
+  projectId: "oijs-429910",
+  keyFilename: "application_default_credentials.json",
+});
 export const addCitation= async(req,res)=>{
     try {
         let response = await Article.findOne({
@@ -354,7 +359,7 @@ export const createArticle = async (req, res) => {
     const fileSize = file.data.length;
     const extension = path.extname(file.name);
     const fileName = "Article-"+file.md5 + extension;
-    const file_path = `${req.protocol}s://${req.get("host")}/articles/${fileName}`;
+    const file_path = `https://storage.cloud.google.com/oijs-bucket/public/articles/${fileName}`
     const allowedType = ['.pdf', '.doc', '.docx','.xml'];
     
     if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});
@@ -362,6 +367,16 @@ export const createArticle = async (req, res) => {
     file.mv(`./public/articles/${fileName}`, async (error) => {
         if (error) return res.status(500).json({ msg: error.message });
         try {
+            const filepath=`./public/articles/${fileName}`;
+            const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+            const storagepath = `public/articles/${fileName}`;
+            const result = await gcs.upload(filepath, {
+                destination: storagepath,
+                predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                metadata: {
+                    contentType: "application/pdf", // Adjust the content type as needed
+                }
+            });
             const article = await Article.create({
                 article_id: findLastArticle+1,
                 journal_id : findJournal.journal_id,
@@ -443,19 +458,30 @@ export const updateArticle = async (req, res) => {
         // validasi
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});
         if(fileSize > 15000000) return res.status(422).json({msg : "Size of document must be less than 10 MB"});
-        // hapus yang lama
-        if(article_path_split[article_path_split.length - 1] != ''){
-            const filepath = `./public/articles/${article_path_split[article_path_split.length - 1]}`;
-            fs.unlinkSync(filepath);
-        }
-
         // terima jurnalnya masukkan ke public
-        file.mv(`./public/articles/${fileName}`, (error) => {
+        file.mv(`./public/articles/${fileName}`, async (error) => {
             if (error) return res.status(500).json({ msg: error.message });
+            try {
+                const filepath=`./public/articles/${fileName}`;
+                const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+                const storagepath = `public/articles/${fileName}`;
+                const result = await gcs.upload(filepath, {
+                    destination: storagepath,
+                    predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                    metadata: {
+                        contentType: "application/pdf", // Adjust the content type as needed
+                    }
+                });
+            } catch (error) {
+                res.status(500).json({msg: "Article failed to update",err:error.message});
+            }
+            
         });
-        article_path = `${req.protocol}s://${req.get("host")}/articles/${fileName}`;
+        article_path = `https://storage.cloud.google.com/oijs-bucket/public/articles/${fileName}`;
+        
     }
     try {
+        
         await Article.update({
             prefix: req.body.prefix,
             title: req.body.title,

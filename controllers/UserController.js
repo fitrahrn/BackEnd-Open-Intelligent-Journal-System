@@ -9,6 +9,11 @@ import db from "../config/database.js";
 import Role from "../models/RoleModel.js";
 import path from "path"
 import fs from "fs"
+import { Storage } from "@google-cloud/storage";
+const storage = new Storage({
+  projectId: "oijs-429910",
+  keyFilename: "application_default_credentials.json",
+});
 export const getUserByUsername = async(req, res) => {
     const username = req.cookies.username;
     try {
@@ -185,20 +190,27 @@ export const updateProfile = async (req, res) => {
         // validasi
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid image format"});
         if(fileSize > 1500000) return res.status(422).json({msg : "Size of image must be less than 1 MB"});
-        // hapus yang lama
-        if(image_path!==null){
-            const image_path_split = image_path.split("/");
-            if(image_path_split[image_path_split.length - 1] != ''){
-                const filepath = `./public/profiles/${image_path_split[image_path_split.length - 1]}`;
-                fs.unlinkSync(filepath);
-            }
-        }
 
         // terima Usernya masukkan ke public
-        file.mv(`./public/profiles/${fileName}`, (error) => {
+        file.mv(`./public/profiles/${fileName}`, async (error) => {
             if (error) return res.status(500).json({ msg: error.message });
+            try {
+                const filepath=`./public/profiles/${fileName}`;
+                const gcs = storage.bucket("oijs-bucket"); // Removed "gs://" from the bucket name
+                const storagepath = `public/profiles/${fileName}`;
+                const result = await gcs.upload(filepath, {
+                    destination: storagepath,
+                    predefinedAcl: 'publicRead', // Set the file to be publicly readable
+                    metadata: {
+                        contentType: `image/${extension.replace('.','')}`, // Adjust the content type as needed
+                    }
+                });
+            } catch (error) {
+                res.status(500).json({msg: "User failed to update",err:error.message});
+            }
         });
-        image_path = `${req.protocol}s://${req.get("host")}/profiles/${fileName}`;
+        image_path = `https://storage.googleapis.com/oijs-bucket/public/profiles/${fileName}`;
+        
     }
     // simpan ke database
     

@@ -101,6 +101,7 @@ export const addRole = async (req,res)=>{
             journal_id: journal_id,
             administrator: false,
             lead_editor:false,
+            editor:false,
             reviewer: false,
             author:false,
             reader:true
@@ -111,13 +112,14 @@ export const addRole = async (req,res)=>{
                 journal_id: journal_id,
                 administrator: false,
                 lead_editor:false,
+                editor:false,
                 reviewer: false,
                 author:false,
                 reader:true
             }
         });
     } catch (error) {
-        res.status(500).json({msg: "Role failed to add"});
+        res.status(500).json({msg: "Role failed to add",err:error.message});
     }
 }
 export const updateRole = async (req,res)=>{

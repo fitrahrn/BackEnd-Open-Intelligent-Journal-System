@@ -73,13 +73,13 @@ export const login = async (req, res) => {
         res.cookie('username', username,{
             httpOnly: true,
             sameSite: "None",
-            maxAge: 24 * 60 * 60,
+            maxAge: 24 * 60 * 60*1000,
             secure: true
         });
         res.cookie('refreshToken', refreshToken,{
             httpOnly: true,
             sameSite: "None",
-            maxAge: 24 * 60 * 60,
+            maxAge: 24 * 60 * 60*1000,
             secure: true
         });
         token=accessToken; 
