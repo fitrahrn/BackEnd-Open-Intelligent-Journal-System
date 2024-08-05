@@ -66,7 +66,7 @@ export const getReviewersFromReviewsId = async(req, res) => {
         }); // seluruh atribut same as SELECT * FROM
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json(error.message);
+        res.status(500).json({msg: "Journal failed to create"});
     }
 }
 export const getReviewersFromReviewersId = async(req, res) => {

@@ -393,13 +393,15 @@ describe('Article Controller', () => {
 
     describe('POST /article/search', () => {
         it('should return articles by title', async () => {
-            Article.findAll.mockResolvedValue(array_article)
+            Issue.findOne.mockResolvedValue(single_issue);
+            Article.findAll.mockResolvedValue([single_article_issue]);
+            Contributors.findAll.mockResolvedValue(contributors_with_user);
             const response = await request(app)
                 .post('/article/search').set('Authorization', `Bearer ${token}`)
                 .send({ title: 'Improving' });
 
                 expect(response.status).toBe(200);
-                expect(response.body).toEqual(array_article);
+                expect(response.body).toEqual([single_article_issue]);
         });
 
         it('should return 500 if there is an error', async () => {

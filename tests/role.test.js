@@ -198,6 +198,7 @@ describe('Role Controller', () => {
                 data: {
                     user_id: array_users[0].user_id,
                     journal_id: 1,
+                    editor: false,
                     administrator: false,
                     lead_editor: false,
                     reviewer: false,

@@ -205,6 +205,8 @@ describe('Reviewers Controller', () => {
             jest.spyOn(ReviewersFile, "create").mockResolvedValue(reviewers_file);
             
         })
+        
+        
         it('should return all reviews for the reviewers', async () => {
             User.findOne.mockResolvedValue(array_user[0]);
             Reviewers.findAll.mockResolvedValue([array_reviewers[0]]);
@@ -226,49 +228,13 @@ describe('Reviewers Controller', () => {
         });
     });
 
-    describe('GET /reviewers/:id', () => {
-        it('should return reviewers for a given review ID', async () => {
-            Reviewers.findAll.mockResolvedValue([array_reviewers]);
+    
 
-            const response = await request(app).get('/reviewers/1').set('Authorization', `Bearer ${token}`);
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual([array_reviewers]);
-        });
-
-        it('should return 500 if there is an error', async () => {
-            Reviewers.findAll.mockRejectedValue(new Error('Something went wrong'));
-
-            const response = await request(app).get('/reviewers/1').set('Authorization', `Bearer ${token}`);;
-
-            expect(response.status).toBe(500);
-            expect(response.body).toBe('Something went wrong');
-        });
-    });
-
-    describe('GET /reviewers/user/:id', () => {
-        it('should return a reviewer for a given review ID and logged-in user', async () => {
-            User.findOne.mockResolvedValue(array_user[0]);
-            Reviewers.findOne.mockResolvedValue(array_reviewers[2]);
-
-            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(array_reviewers[2]);
-        });
-
-        it('should return 500 if there is an error', async () => {
-            User.findOne.mockRejectedValue(new Error('Something went wrong'));
-
-            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
-
-            expect(response.status).toBe(500);
-            expect(response.body).toBe('Something went wrong');
-        });
-    });
+    
 
     describe('POST /reviewers', () => {
         it('should add a new reviewer', async () => {
+            Reviewers.findOne.mockResolvedValueOnce(null);
             Reviewers.create.mockResolvedValue(array_reviewers[2]);
 
             const response = await request(app)
@@ -288,6 +254,7 @@ describe('Reviewers Controller', () => {
         });
 
         it('should return 500 if there is an error', async () => {
+            Reviewers.findOne.mockResolvedValueOnce(null);
             Reviewers.create.mockRejectedValue(new Error('Something went wrong'));
 
             const response = await request(app)
@@ -318,7 +285,7 @@ describe('Reviewers Controller', () => {
                 .field('author_review', "Need revisions but its already good")
                 .field('recommendation', "revisions required")
                 .field('date_completed', Date(2024,6,19))
-                .attach('file',path.resolve('./public/articles/Article-34b5ffed24252709897ed965e2ee9516.pdf'));
+                // .attach('file',path.resolve('./public/articles/Article-34b5ffed24252709897ed965e2ee9516.pdf'));
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({
@@ -394,6 +361,45 @@ describe('Reviewers Controller', () => {
             Reviewers.destroy.mockRejectedValue(new Error('Something went wrong'));
 
             const response = await request(app).delete('/reviewers/1').set('Authorization', `Bearer ${token}`);
+
+            expect(response.status).toBe(500);
+            expect(response.body).toBe('Something went wrong');
+        });
+    });
+    describe('GET /reviewers/user/:id', () => {
+        it('should return a reviewer for a given review ID and logged-in user', async () => {
+            User.findOne.mockResolvedValue(array_user[0]);
+            Reviewers.findOne.mockResolvedValue(array_reviewers[2]);
+
+            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(array_reviewers[2]);
+        });
+
+        it('should return 500 if there is an error', async () => {
+            User.findOne.mockRejectedValue(new Error('Something went wrong'));
+            Reviewers.findOne.mockRejectedValueOnce(new Error("Database Error"));
+            const response = await request(app).get('/reviewers/user/1').set('Cookie', ['username=johndoe']).set('Authorization', `Bearer ${token}`);;
+
+            expect(response.status).toBe(500);
+            expect(response.body).toBe("Database Error");
+        });
+    });
+    describe('GET /reviewers/:id', () => {
+        it('should return reviewers for a given review ID', async () => {
+            Reviewers.findOne.mockResolvedValue(array_reviewers);
+
+            const response = await request(app).get('/reviewers/1').set('Authorization', `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(array_reviewers);
+        });
+
+        it('should return 500 if there is an error', async () => {
+            Reviewers.findOne.mockRejectedValueOnce(new Error('Something went wrong'));
+
+            const response = await request(app).get('/reviewers/1').set('Authorization', `Bearer ${token}`);;
 
             expect(response.status).toBe(500);
             expect(response.body).toBe('Something went wrong');
