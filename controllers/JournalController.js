@@ -78,7 +78,7 @@ export const createJournal = async (req, res) => {
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = journal_path + extension;
-        const file_path = `https://storage.googleapis.com/oijs-bucket/public/profiles/${fileName}`;
+        const file_path = `https://storage.googleapis.com/oijs-bucket/public/images/${fileName}`;
         const allowedType = ['.jpg', '.png', '.webp'];
         
         if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid image format"});

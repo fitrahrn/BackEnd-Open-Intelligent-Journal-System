@@ -1,0 +1,8 @@
+[
+    {
+      "origin": ["https://frontend-dot-oijs-429910.et.r.appspot.com"],
+      "method": ["GET","POST","PATCH","PUT"],
+      "responseHeader": ["Content-Type"],
+      "maxAgeSeconds": 3600
+    }
+]

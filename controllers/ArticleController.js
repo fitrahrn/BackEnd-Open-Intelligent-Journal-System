@@ -359,7 +359,7 @@ export const createArticle = async (req, res) => {
     const fileSize = file.data.length;
     const extension = path.extname(file.name);
     const fileName = "Article-"+file.md5 + extension;
-    const file_path = `https://storage.cloud.google.com/oijs-bucket/public/articles/${fileName}`
+    const file_path = `https://storage.googleapis.com/oijs-bucket/public/articles/${fileName}`
     const allowedType = ['.pdf', '.doc', '.docx','.xml'];
     
     if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});
@@ -443,10 +443,13 @@ export const updateArticle = async (req, res) => {
     let article_path = article.article_path
     const article_path_split = article_path.split("/");
     let fileName = ""
-
-    if(req.files === null) {
+    if(req.files === null && req.body.article_path!==null){
+        article_path = req.body.article_path
+    } 
+    else if(req.files === null) {
         fileName = article_path_split[article_path_split.length - 1]
-    } else {
+    }
+    else {
         // user mengupload song baru
         // buat nama file (md5) baru juga
         const file = req.files.file;
@@ -477,7 +480,7 @@ export const updateArticle = async (req, res) => {
             }
             
         });
-        article_path = `https://storage.cloud.google.com/oijs-bucket/public/articles/${fileName}`;
+        article_path = `https://storage.googleapis.com/oijs-bucket/public/articles/${fileName}`;
         
     }
     try {

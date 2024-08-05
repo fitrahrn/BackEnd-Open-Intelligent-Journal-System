@@ -158,7 +158,7 @@ export const updateProfile = async (req, res) => {
     }
     let image_path = user.profile_picture
     let fileName = ""
-    if(image_path === null&& req.files.file === null) {
+    if(image_path === null&& req.files === null) {
         try {
             await User.update(req.body, {
                 where : {
@@ -173,9 +173,7 @@ export const updateProfile = async (req, res) => {
         }
         return ;
     }
-
-
-    else if(req.files.file === null && image_path!==null) {
+    else if(req.files === null && image_path!==null) {
         const image_path_split = image_path.split("/");
         fileName = image_path_split[image_path_split.length - 1]
     } else {

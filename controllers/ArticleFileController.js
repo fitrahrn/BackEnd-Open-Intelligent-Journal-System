@@ -48,7 +48,7 @@ export const createArticleFile = async (req,res)=>{
     const fileSize = file.data.length;
     const extension = path.extname(file.name);
     const fileName = "Article-"+file.md5 + extension;
-    const file_path = `https://storage.cloud.google.com/oijs-bucket/public/articles/${fileName}`
+    const file_path = `https://storage.googleapis.com/oijs-bucket/public/articles/${fileName}`
     const allowedType = ['.pdf', '.doc', '.docx','.xml'];
     
     if(!allowedType.includes(extension.toLowerCase())) return res.status(422).json({msg: "invalid document format"});

@@ -154,7 +154,7 @@ export const writeReviews = async (req,res)=>{
         const fileSize = file.data.length;
         const extension = path.extname(file.name);
         const fileName = "Review-"+file.md5 + extension;
-        const file_path = `https://storage.cloud.google.com/oijs-bucket/public/reviews/${fileName}`;
+        const file_path = `https://storage.googleapis.com/oijs-bucket/public/reviews/${fileName}`;
         const allowedType = ['.pdf', '.doc', '.docx','.xml'];
         const reviewers = await Reviewers.findOne({
             where : {
@@ -196,8 +196,7 @@ export const writeReviews = async (req,res)=>{
                     data: req.body
                 });
             } catch (error) {
-                console.log(error.message)
-                res.status(500).json({msg: "Reviewers failed to update"});
+                res.status(500).json({msg: "Reviewers failed to update",err:error.message});
             }
         });
     }

@@ -80,14 +80,14 @@ export const updateContributors = async (req,res)=>{
 export const deleteContributors= async(req, res) => {
     const contributors = await Contributors.findOne({
         where : {
-            contributors_id : req.params.id
+            article_id : req.params.id
         }
     });
     if(!contributors) return res.status(404).json({msg : "No Contributors Found"});
     try {
         await Contributors.destroy({
             where : {
-                Contributors_id : req.params.id
+                article_id : req.params.id
             }
         });
         res.status(200).json({msg : "Contributors Deleted Successfully"});
