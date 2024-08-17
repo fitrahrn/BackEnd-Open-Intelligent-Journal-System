@@ -109,14 +109,14 @@ export const updateArticleFile = async (req,res)=>{
 export const deleteArticleFile= async(req, res) => {
     const articleFile = await ArticleFile.findOne({
         where : {
-            article_file_id : req.params.id
+            article_id : req.params.id
         }
     });
     if(!articleFile) return res.status(404).json({msg : "No Article File Found"});
     try {
         await ArticleFile.destroy({
             where : {
-                article_file_id : req.params.id
+                article_id : req.params.id
             }
         });
         res.status(200).json({msg : "Article File Deleted Successfully"});

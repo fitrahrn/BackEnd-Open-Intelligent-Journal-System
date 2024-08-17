@@ -525,6 +525,7 @@ export const deleteArticle = async(req, res) => {
     });
     if(!article) return res.status(404).json({msg : "No Article Found"});
     try {
+        
         await Article.destroy({
             where : {
                 article_id : req.params.id

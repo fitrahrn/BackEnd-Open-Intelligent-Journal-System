@@ -34,6 +34,9 @@ export const getUserJournalCount = async(req, res) => {
                 model:Article,
                 required: true,
                 attributes:['article_id','journal_id',],
+                where:{
+                    workflow_phase:"published",
+                },
                 include:[{
                     model:Contributors,
                     required: true,
